@@ -1,0 +1,866 @@
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MODBUS_RTU
+OBJECT MODULE PLACED IN ..\Output\modbus_rtu.obj
+COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE ..\Emembed\Src\modbus_rtu.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..
+                    -\BSP\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\modbus_rtu.lst) OBJECT(
+                    -..\Output\modbus_rtu.obj)
+
+line level    source
+
+   1          #include "modbus_rtu.h"
+   2          
+   3          MODBIS_INFO modbus;
+   4          
+   5          /**
+   6           * @brief       modbus_rtu  无奇偶校验
+   7           *
+   8           * @param   void
+   9           *
+  10           * @return  void 
+  11          **/
+  12          void Modbus_Event_485( void )
+  13          {
+  14   1          uint16_t crc,rccrc;
+  15   1          
+  16   1          /*1.接收完毕                                           */
+  17   1          if( rs485.RX4_rev_end_Flag == 1 )
+  18   1          {
+  19   2              /*2.清空接收完毕标志位                              */    
+  20   2              rs485.RX4_rev_end_Flag = 0;
+  21   2      
+  22   2              /*3.CRC校验                                         */
+  23   2              crc = MODBUS_CRC16(rs485.RX4_buf, rs485.RX4_rev_cnt-2);
+  24   2              rccrc = (rs485.RX4_buf[rs485.RX4_rev_cnt-1]) | (rs485.RX4_buf[rs485.RX4_rev_cnt-2]<<8);
+  25   2      
+  26   2              /*4.清空接收计数                                    */
+  27   2              rs485.RX4_rev_cnt = 0; 
+  28   2      
+  29   2              /*5.CRC校验通过，进行地址域校验                      */
+  30   2              if( crc == rccrc )
+  31   2              {
+  32   3                  /*6.地址域校验通过，进入相应功能函数进行处理      */
+  33   3                  if( rs485.RX4_buf[0] == ADDR_485 )
+  34   3                  {
+  35   4                      switch ( rs485.RX4_buf[1] )
+  36   4                      {
+  37   5                          case 0x03:
+  38   5                              Modbus_Fun3_485();
+  39   5                              break;
+  40   5      
+  41   5                          case 0x04:
+  42   5                              Modbus_Fun4_485();
+  43   5                              break;
+  44   5      
+  45   5                          case 0x06:
+  46   5                              Modbus_Fun6_485();
+  47   5                              break;  
+  48   5      
+  49   5                          case 0x10:  
+  50   5                              Modbus_Fun16_485();
+  51   5      
+  52   5                          default:
+  53   5                              break;
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 2   
+
+  54   5                      }
+  55   4                  }
+  56   3              }
+  57   2          }
+  58   1      }
+  59          
+  60          
+  61          /**
+  62           * @brief       modbus_rtu  无奇偶校验
+  63           *
+  64           * @param   void
+  65           *
+  66           * @return  void 
+  67          **/
+  68          void Modbus_Event_Sata( void )
+  69          {
+  70   1          uint16_t crc,rccrc;
+  71   1          
+  72   1          /*1.接收完毕                                           */
+  73   1          if( sata.RX1_rev_end_Flag == 1 )
+  74   1          {
+  75   2              /*2.清空接收完毕标志位                              */    
+  76   2              sata.RX1_rev_end_Flag = 0;
+  77   2      
+  78   2              /*3.CRC校验                                         */
+  79   2              crc = MODBUS_CRC16(sata.RX1_buf, sata.RX1_rev_cnt-2);
+  80   2              rccrc = (sata.RX1_buf[sata.RX1_rev_cnt-2]) | (sata.RX1_buf[sata.RX1_rev_cnt-1]<<8);
+  81   2      
+  82   2              /*4.清空接收计数                                    */
+  83   2              sata.RX1_rev_cnt = 0; 
+  84   2      
+  85   2              /*5.CRC校验通过，进行地址域校验                      */
+  86   2              if( crc == rccrc )
+  87   2              {
+  88   3                  /*6.地址域校验通过，进入相应功能函数进行处理      */
+  89   3                  if( sata.RX1_buf[0] == ADDR_SATA )
+  90   3                  {
+  91   4                      switch ( sata.RX1_buf[1] )
+  92   4                      {
+  93   5                          case 0x03:
+  94   5                              Modbus_Fun3_Sata();
+  95   5      
+  96   5                              break;
+  97   5      
+  98   5                          case 0x04:
+  99   5                              Modbus_Fun4_Sata();
+ 100   5                              
+ 101   5                              break;
+ 102   5      
+ 103   5                          case 0x06:
+ 104   5                              Modbus_Fun6_Sata();
+ 105   5      
+ 106   5                              break;  
+ 107   5      
+ 108   5                          case 0x10:  
+ 109   5                              Modbus_Fun16_Sata();
+ 110   5      
+ 111   5                          default:
+ 112   5                              break;
+ 113   5                      }
+ 114   4                  }
+ 115   3              }
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 3   
+
+ 116   2          }
+ 117   1      }
+ 118          
+ 119          /**
+ 120           * @brief       读输入寄存器  03
+ 121           *
+ 122           * @param   void
+ 123           *
+ 124           * @return  void 
+ 125          **/
+ 126          void Modbus_Fun3_485( void )
+ 127          {
+ 128   1          uint16_t i;
+ 129   1      
+ 130   1          modbus.send_value_addr  = 3;                //DATA1 H 位置
+ 131   1          modbus.byte_cnt   = (rs485.RX4_buf[4]<<8 | rs485.RX4_buf[5]) *2;
+ 132   1          modbus.start_addr = rs485.RX4_buf[2]<<8 | rs485.RX4_buf[3];
+ 133   1      
+ 134   1          rs485.TX4_buf[0]  = ADDR_485;                //Addr
+ 135   1          rs485.TX4_buf[1]  = 0x03;                   //Fun
+ 136   1          rs485.TX4_buf[2]  = modbus.byte_cnt;        //Byte Count
+ 137   1      
+ 138   1          for( i = modbus.start_addr; i < modbus.start_addr + modbus.byte_cnt/2; i++ )
+ 139   1          {
+ 140   2              /*    每次循环前初始化byte_info                       */
+ 141   2              modbus.byte_info_H = modbus.byte_info_L = 0X00;
+ 142   2              switch (i)
+ 143   2              {   
+ 144   3                  /*  40001 风速查询                     */
+ 145   3                  case 0x00:
+ 146   3      
+ 147   3      
+ 148   3                      break;
+ 149   3      
+ 150   3                  /*  40002 LED开关状态查询                     */    
+ 151   3                  case 0x01:
+ 152   3      
+ 153   3                      break;
+ 154   3      
+ 155   3                  /*  40003 3路220V开关使能查询                         */
+ 156   3                  case 0x02:    
+ 157   3      
+ 158   3                      break;
+ 159   3      
+ 160   3                  /*  40004 同步状态查询              */
+ 161   3                  case 0x03:    
+ 162   3      
+ 163   3      
+ 164   3                      break;
+ 165   3      
+ 166   3                  /*  40005 工作模式查询                     */
+ 167   3                  case 0x04:   
+ 168   3      
+ 169   3                      break;
+ 170   3      
+ 171   3                  /*  40006 报警温度查询                     */
+ 172   3                  case 5:   
+ 173   3              
+ 174   3      
+ 175   3                      break;
+ 176   3                  default:
+ 177   3                      break;
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 4   
+
+ 178   3              }
+ 179   2              rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_H;
+ 180   2              rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_L;
+ 181   2          }
+ 182   1          slave_to_master_485(0x03,3 + modbus.byte_cnt);
+ 183   1      }
+ 184          
+ 185          
+ 186          /**
+ 187           * @brief       读输入寄存器  03
+ 188           *
+ 189           * @param   void
+ 190           *
+ 191           * @return  void 
+ 192          **/
+ 193          void Modbus_Fun3_Sata( void )
+ 194          {
+ 195   1          uint16_t i;
+ 196   1      
+ 197   1          modbus.send_value_addr  = 3;                //DATA1 H 位置
+ 198   1          modbus.byte_cnt   = (sata.RX1_buf[4]<<8 | sata.RX1_buf[5]) *2;
+ 199   1          modbus.start_addr = sata.RX1_buf[2]<<8 | sata.RX1_buf[3];
+ 200   1      
+ 201   1          sata.TX1_buf[0]  = ADDR_SATA;                //Addr
+ 202   1          sata.TX1_buf[1]  = 0x03;                   //Fun
+ 203   1          sata.TX1_buf[2]  = modbus.byte_cnt;        //Byte Count
+ 204   1      
+ 205   1          for( i = modbus.start_addr; i < modbus.start_addr + modbus.byte_cnt/2; i++ )
+ 206   1          {
+ 207   2              /*    每次循环前初始化byte_info                       */
+ 208   2              modbus.byte_info_H = modbus.byte_info_L = 0X00;
+ 209   2              switch (i)
+ 210   2              {   
+ 211   3                  /*  40001 风速查询                     */
+ 212   3                  case 0x00:
+ 213   3                      modbus.byte_info_H = 0x00;
+ 214   3                      modbus.byte_info_L = qdc_info.fan_level;
+ 215   3      
+ 216   3                      break;
+ 217   3      
+ 218   3                  /*  40002 LED开关状态查询                     */    
+ 219   3                  case 0x01:
+ 220   3                      modbus.byte_info_H = 0x00;
+ 221   3                      modbus.byte_info_L = qdc_info.led_switch;
+ 222   3      
+ 223   3                      break;
+ 224   3      
+ 225   3                  /*  40003 3路220V开关使能查询                         */
+ 226   3                  case 0x02:    
+ 227   3      
+ 228   3                      break;
+ 229   3      
+ 230   3                  /*  40004 同步状态查询              */
+ 231   3                  case 0x03:    
+ 232   3      
+ 233   3      
+ 234   3                      break;
+ 235   3      
+ 236   3                  /*  40005 工作模式查询                     */
+ 237   3                  case 0x04:   
+ 238   3      
+ 239   3                      break;
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 5   
+
+ 240   3      
+ 241   3                  /*  40006 报警温度查询                     */
+ 242   3                  case 5:   
+ 243   3              
+ 244   3      
+ 245   3                      break;
+ 246   3                  default:
+ 247   3                      break;
+ 248   3              }
+ 249   2              sata.TX1_buf[modbus.send_value_addr++] = modbus.byte_info_H;
+ 250   2              sata.TX1_buf[modbus.send_value_addr++] = modbus.byte_info_L;
+ 251   2          }
+ 252   1          slave_to_master_Sata(0x03,3 + modbus.byte_cnt);
+ 253   1      }
+ 254          
+ 255          /**
+ 256           * @brief       读输出寄存器  04
+ 257           *
+ 258           * @param   void
+ 259           *
+ 260           * @return  void 
+ 261          **/
+ 262          void Modbus_Fun4_485( void )
+ 263          {
+ 264   1          uint16_t i;
+ 265   1      
+ 266   1          modbus.send_value_addr  = 3;                 //DATA1 H 位置
+ 267   1          modbus.byte_cnt   = (rs485.RX4_buf[4]<<8 | rs485.RX4_buf[5]) *2;
+ 268   1          modbus.start_addr = rs485.RX4_buf[2]<<8 | rs485.RX4_buf[3];
+ 269   1      
+ 270   1          rs485.TX4_buf[0]  = ADDR_485;                //Addr
+ 271   1          rs485.TX4_buf[1]  = 0x04;                   //Fun
+ 272   1          rs485.TX4_buf[2]  = modbus.byte_cnt;        //Byte Count
+ 273   1      
+ 274   1          for( i = modbus.start_addr; i < modbus.start_addr + modbus.byte_cnt/2; i++ )
+ 275   1          {
+ 276   2              /*    每次循环前初始化byte_info                       */
+ 277   2              modbus.byte_info_H = modbus.byte_info_L = 0X00;
+ 278   2              switch (i)
+ 279   2              {
+ 280   3                  /*  30001  NTC1、NTC2温度查询                           */
+ 281   3                  case 0x00:
+ 282   3      
+ 283   3      
+ 284   3                      break;
+ 285   3      
+ 286   3                  /*  30002  NTC3、NTC4温度查询                */
+ 287   3                  case 0x01:
+ 288   3      
+ 289   3      
+ 290   3                      break;
+ 291   3      
+ 292   3                  /*  30003 环境温湿度查询                   */
+ 293   3                  case 0x02:
+ 294   3      
+ 295   3                      break;
+ 296   3      
+ 297   3                  /*  30004 Signal_IN状态查询                   */
+ 298   3                  case 0x03:
+ 299   3       
+ 300   3      
+ 301   3                      break;
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 6   
+
+ 302   3                      
+ 303   3                  /*  30005 运行时间（min）                   */
+ 304   3                  case 0x04:
+ 305   3      
+ 306   3                      break;
+ 307   3      
+ 308   3                  /*  30006 运行时间（h）                   */
+ 309   3                  case 0x05:
+ 310   3          
+ 311   3      
+ 312   3                      break;
+ 313   3      
+ 314   3                  default:
+ 315   3                      break;
+ 316   3              }
+ 317   2              rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_H;
+ 318   2              rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_L;
+ 319   2          }
+ 320   1          slave_to_master_485(0x04,3 + modbus.byte_cnt);
+ 321   1      }
+ 322          
+ 323          
+ 324          /**
+ 325           * @brief       读输出寄存器  04
+ 326           *
+ 327           * @param   void
+ 328           *
+ 329           * @return  void 
+ 330          **/
+ 331          void Modbus_Fun4_Sata( void )
+ 332          {
+ 333   1          uint16_t i;
+ 334   1      
+ 335   1          modbus.send_value_addr  = 3;                 //DATA1 H 位置
+ 336   1          modbus.byte_cnt   = (sata.RX1_buf[4]<<8 | sata.RX1_buf[5]) *2;
+ 337   1          modbus.start_addr = sata.RX1_buf[2]<<8 | sata.RX1_buf[3];
+ 338   1      
+ 339   1          sata.TX1_buf[0]  = ADDR_485;                //Addr
+ 340   1          sata.TX1_buf[1]  = 0x04;                   //Fun
+ 341   1          sata.TX1_buf[2]  = modbus.byte_cnt;        //Byte Count
+ 342   1      
+ 343   1          for( i = modbus.start_addr; i < modbus.start_addr + modbus.byte_cnt/2; i++ )
+ 344   1          {
+ 345   2              /*    每次循环前初始化byte_info                       */
+ 346   2              modbus.byte_info_H = modbus.byte_info_L = 0X00;
+ 347   2              switch (i)
+ 348   2              {
+ 349   3                  /*  30001  NTC1、NTC2温度查询                           */
+ 350   3                  case 0x00:
+ 351   3                      modbus.byte_info_H = 0x00;
+ 352   3                      modbus.byte_info_L = 0x00;
+ 353   3      
+ 354   3                      break;
+ 355   3      
+ 356   3                  /*  30002  NTC3、NTC4温度查询                */
+ 357   3                  case 0x01:
+ 358   3                      waste_ink_scan();
+ 359   3                      modbus.byte_info_H = 0x00;
+ 360   3                      modbus.byte_info_L = qdc_info.waste_ink;
+ 361   3      
+ 362   3                      break;
+ 363   3      
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 7   
+
+ 364   3                  /*  30003 环境温湿度查询                   */
+ 365   3                  case 0x02:
+ 366   3      
+ 367   3                      break;
+ 368   3      
+ 369   3                  /*  30004 Signal_IN状态查询                   */
+ 370   3                  case 0x03:
+ 371   3       
+ 372   3      
+ 373   3                      break;
+ 374   3                      
+ 375   3                  /*  30005 运行时间（min）                   */
+ 376   3                  case 0x04:
+ 377   3      
+ 378   3                      break;
+ 379   3      
+ 380   3                  /*  30006 运行时间（h）                   */
+ 381   3                  case 0x05:
+ 382   3          
+ 383   3      
+ 384   3                      break;
+ 385   3      
+ 386   3                  default:
+ 387   3                      break;
+ 388   3              }
+ 389   2              rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_H;
+ 390   2              rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_L;
+ 391   2          }
+ 392   1          slave_to_master_Sata(0x04,3 + modbus.byte_cnt);
+ 393   1      }
+ 394          
+ 395          /**
+ 396           * @brief       写单个输出寄存器  06
+ 397           *
+ 398           * @param   void
+ 399           *
+ 400           * @return  void 
+ 401          **/
+ 402          void Modbus_Fun6_485( void )
+ 403          {
+ 404   1          switch (rs485.RX4_buf[3])
+ 405   1          {
+ 406   2              /*  40001  风速设置                 */
+ 407   2              case 0x00:                  
+ 408   2      
+ 409   2                  break;
+ 410   2      
+ 411   2              /*  40002  LED 开关状态设置                          */
+ 412   2              case 0x01:                                         
+ 413   2      
+ 414   2      
+ 415   2                  break;
+ 416   2      
+ 417   2              /*  40003 三路220V输出使能设置                          */
+ 418   2              case 0x02:                                         
+ 419   2      
+ 420   2                  break;  
+ 421   2                  
+ 422   2              /*  40004  同步状态设置                   */
+ 423   2              case 0x03:                                         
+ 424   2      
+ 425   2                  break;
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 8   
+
+ 426   2      
+ 427   2              /*  40005  工作模式设置                   */
+ 428   2              case 0x04:                                         
+ 429   2      
+ 430   2      
+ 431   2                  break;
+ 432   2      
+ 433   2              /*  40006  报警温度设置                   */
+ 434   2              case 0x05:                                         
+ 435   2           
+ 436   2                  break;
+ 437   2      
+ 438   2              default:
+ 439   2                  break;   
+ 440   2          }
+ 441   1      
+ 442   1          slave_to_master_485(0x06,8);
+ 443   1      
+ 444   1          eeprom_data_record();
+ 445   1      }
+ 446          
+ 447          
+ 448          /**
+ 449           * @brief       写单个输出寄存器  06
+ 450           *
+ 451           * @param   void
+ 452           *
+ 453           * @return  void 
+ 454          **/
+ 455          void Modbus_Fun6_Sata( void )
+ 456          {
+ 457   1          switch (sata.RX1_buf[3])
+ 458   1          {
+ 459   2              /*  40001  风速设置                 */
+ 460   2              case 0x00:                  
+ 461   2                  fan_ctrl(sata.RX1_buf[5]);
+ 462   2      
+ 463   2                  break;
+ 464   2      
+ 465   2              /*  40002  LED 开关状态设置                          */
+ 466   2              case 0x01:                                         
+ 467   2                  led_ctrl(sata.RX1_buf[5]);
+ 468   2      
+ 469   2                  break;
+ 470   2      
+ 471   2              /*  40003 三路220V输出使能设置                          */
+ 472   2              case 0x02:                                         
+ 473   2      
+ 474   2                  break;  
+ 475   2                  
+ 476   2              /*  40004  同步状态设置                   */
+ 477   2              case 0x03:                                         
+ 478   2      
+ 479   2                  break;
+ 480   2      
+ 481   2              /*  40005  工作模式设置                   */
+ 482   2              case 0x04:                                         
+ 483   2      
+ 484   2      
+ 485   2                  break;
+ 486   2      
+ 487   2              /*  40006  报警温度设置                   */
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 9   
+
+ 488   2              case 0x05:                                         
+ 489   2           
+ 490   2                  break;
+ 491   2      
+ 492   2              default:
+ 493   2                  break;   
+ 494   2          }
+ 495   1      
+ 496   1          slave_to_master_Sata(0x06,8);
+ 497   1      
+ 498   1          // eeprom_data_record();
+ 499   1      }
+ 500          
+ 501          /**
+ 502           * @brief       写多个输出寄存器  16
+ 503           *
+ 504           * @param   void
+ 505           *
+ 506           * @return  void 
+ 507          **/
+ 508          void Modbus_Fun16_485( void )
+ 509          {
+ 510   1          uint16_t i;
+ 511   1      
+ 512   1          modbus.rcv_value_addr = 7;                  //DATA1 H位置
+ 513   1          modbus.byte_cnt   = rs485.RX4_buf[6];
+ 514   1          modbus.start_addr = rs485.RX4_buf[2]<<8 | rs485.RX4_buf[3];
+ 515   1      
+ 516   1          
+ 517   1          for( i = modbus.start_addr; i < modbus.start_addr + modbus.byte_cnt/2; i++)
+ 518   1          {
+ 519   2              modbus.byte_info_H = rs485.RX4_buf[modbus.rcv_value_addr];
+ 520   2              modbus.byte_info_L = rs485.RX4_buf[modbus.rcv_value_addr + 1];
+ 521   2              switch (i)
+ 522   2              {
+ 523   3                  /*  40001  风速设置                 */
+ 524   3                  case 0x00:
+ 525   3      
+ 526   3                      break;
+ 527   3                  
+ 528   3                  /*  40002  LED 开关状态设置                          */
+ 529   3                  case 0x01:
+ 530   3                      led_ctrl(modbus.byte_info_L);
+ 531   3      
+ 532   3                      eeprom.led_info = modbus.byte_info_L;
+ 533   3      
+ 534   3                      break;
+ 535   3      
+ 536   3                  /*  40003 三路220V输出使能设置                          */
+ 537   3                  case 0x02:
+ 538   3      
+ 539   3      
+ 540   3                      break;
+ 541   3      
+ 542   3                  
+ 543   3                  /*  40004  同步状态设置                   */
+ 544   3                  case 0x03:
+ 545   3      
+ 546   3      
+ 547   3                      break;
+ 548   3      
+ 549   3                  /*  40005  工作模式设置                   */
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 10  
+
+ 550   3                  case 0x04:                                         
+ 551   3      
+ 552   3      
+ 553   3                      break;
+ 554   3      
+ 555   3                  /*  40006  报警温度设置                   */
+ 556   3                  case 0x05:                                         
+ 557   3      
+ 558   3                      
+ 559   3                      break;
+ 560   3                      
+ 561   3                  default:
+ 562   3                      break;
+ 563   3              }
+ 564   2              modbus.rcv_value_addr += 2;         //从Value1_H →→ 从Value2_H
+ 565   2          }
+ 566   1      
+ 567   1          slave_to_master_485(0x10,8);
+ 568   1      
+ 569   1          eeprom_data_record();                      //记录更改后的值
+ 570   1      }
+ 571          
+ 572          
+ 573          /**
+ 574           * @brief       写多个输出寄存器  16
+ 575           *
+ 576           * @param   void
+ 577           *
+ 578           * @return  void 
+ 579          **/
+ 580          void Modbus_Fun16_Sata( void )
+ 581          {
+ 582   1          uint16_t i;
+ 583   1      
+ 584   1          modbus.rcv_value_addr = 7;                  //DATA1 H位置
+ 585   1          modbus.byte_cnt   = sata.RX1_buf[6];
+ 586   1          modbus.start_addr = sata.RX1_buf[2]<<8 |sata.RX1_buf[3];
+ 587   1      
+ 588   1          
+ 589   1          for( i = modbus.start_addr; i < modbus.start_addr + modbus.byte_cnt/2; i++)
+ 590   1          {
+ 591   2              modbus.byte_info_H = sata.RX1_buf[modbus.rcv_value_addr];
+ 592   2              modbus.byte_info_L = sata.RX1_buf[modbus.rcv_value_addr + 1];
+ 593   2              switch (i)
+ 594   2              {
+ 595   3                  /*  40001  风速设置                 */
+ 596   3                  case 0x00:
+ 597   3      
+ 598   3                      break;
+ 599   3                  
+ 600   3                  /*  40002  LED 开关状态设置                          */
+ 601   3                  case 0x01:
+ 602   3                      led_ctrl(modbus.byte_info_L);
+ 603   3      
+ 604   3                      break;
+ 605   3      
+ 606   3                  /*  40003 三路220V输出使能设置                          */
+ 607   3                  case 0x02:
+ 608   3      
+ 609   3      
+ 610   3                      break;
+ 611   3      
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 11  
+
+ 612   3                  
+ 613   3                  /*  40004  同步状态设置                   */
+ 614   3                  case 0x03:
+ 615   3      
+ 616   3      
+ 617   3                      break;
+ 618   3      
+ 619   3                  /*  40005  工作模式设置                   */
+ 620   3                  case 0x04:                                         
+ 621   3      
+ 622   3      
+ 623   3                      break;
+ 624   3      
+ 625   3                  /*  40006  报警温度设置                   */
+ 626   3                  case 0x05:                                         
+ 627   3      
+ 628   3                      
+ 629   3                      break;
+ 630   3                      
+ 631   3                  default:
+ 632   3                      break;
+ 633   3              }
+ 634   2              modbus.rcv_value_addr += 2;         //从Value1_H →→ 从Value2_H
+ 635   2          }
+ 636   1      
+ 637   1          slave_to_master_Sata(0x10,8);
+ 638   1      
+ 639   1          //eeprom_data_record();                      //记录更改后的值
+ 640   1      }
+ 641          
+ 642          /**
+ 643           * @brief       从机回复主机
+ 644           *  
+ 645           * @param   code_num:功能码       
+ 646           * @param   length:数据长度        
+ 647           * 
+ 648            @return  crc16:crc校验的值 2byte
+ 649           */
+ 650          void slave_to_master_485(uint8_t code_num,uint8_t length)
+ 651          {
+ 652   1          uint16_t crc;
+ 653   1      
+ 654   1          switch (code_num)
+ 655   1          {
+ 656   2              case 0x03:
+ 657   2                  crc = MODBUS_CRC16(rs485.TX4_buf,length);
+ 658   2      
+ 659   2                  rs485.TX4_buf[length+1] = crc;                 //CRC H
+ 660   2                  rs485.TX4_buf[length] = crc>>8;            //CRC L
+ 661   2      
+ 662   2                  rs485.TX4_send_bytelength = length + 2;
+ 663   2                  
+ 664   2                  break;
+ 665   2              case 0x04:
+ 666   2                  crc = MODBUS_CRC16(rs485.TX4_buf,length);
+ 667   2      
+ 668   2                  rs485.TX4_buf[length+1] = crc;                 //CRC H
+ 669   2                  rs485.TX4_buf[length] = crc>>8;            //CRC L
+ 670   2      
+ 671   2                  rs485.TX4_send_bytelength = length + 2;
+ 672   2                  
+ 673   2                  break;    
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 12  
+
+ 674   2      
+ 675   2              case 0x06:
+ 676   2                  memcpy(rs485.TX4_buf,rs485.RX4_buf,8);
+ 677   2      
+ 678   2                  rs485.TX4_send_bytelength = length;
+ 679   2                  
+ 680   2                  break;   
+ 681   2      
+ 682   2              case 0x10:
+ 683   2                  memcpy(rs485.TX4_buf,rs485.RX4_buf,6);
+ 684   2              
+ 685   2                  crc = MODBUS_CRC16(rs485.TX4_buf,6);
+ 686   2      
+ 687   2                  rs485.TX4_buf[7] = crc;                 //CRC H
+ 688   2                  rs485.TX4_buf[6] = crc>>8;              //CRC L
+ 689   2              
+ 690   2                  rs485.TX4_send_bytelength = length;
+ 691   2                  
+ 692   2                  break;         
+ 693   2      
+ 694   2              default:
+ 695   2                  break;
+ 696   2          }
+ 697   1      
+ 698   1          DR_485 = 1;                                 //485可以发送
+ 699   1          delay_ms(2);
+ 700   1          S4CON |= S4TI;                              //开始发送
+ 701   1          delay_ms(1);
+ 702   1      }
+ 703          
+ 704          
+ 705          /**
+ 706           * @brief       从机回复主机
+ 707           *  
+ 708           * @param   code_num:功能码       
+ 709           * @param   length:数据长度        
+ 710           * 
+ 711            @return  crc16:crc校验的值 2byte
+ 712           */
+ 713          void slave_to_master_Sata(uint8_t code_num,uint8_t length)
+ 714          {
+ 715   1          uint16_t crc;
+ 716   1      
+ 717   1          switch (code_num)
+ 718   1          {
+ 719   2              case 0x03:
+ 720   2                  crc = MODBUS_CRC16(sata.TX1_buf,length);
+ 721   2      
+ 722   2                  sata.TX1_buf[length+1] = crc>>8;                 //CRC H
+ 723   2                  sata.TX1_buf[length] = crc;            //CRC L
+ 724   2      
+ 725   2                  sata.TX1_send_bytelength = length + 2;
+ 726   2                  
+ 727   2                  break;
+ 728   2              case 0x04:
+ 729   2                  crc = MODBUS_CRC16(rs485.TX4_buf,length);
+ 730   2      
+ 731   2                  rs485.TX4_buf[length+1] = crc;                 //CRC H
+ 732   2                  rs485.TX4_buf[length] = crc>>8;            //CRC L
+ 733   2      
+ 734   2                  rs485.TX4_send_bytelength = length + 2;
+ 735   2                  
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 13  
+
+ 736   2                  break;    
+ 737   2      
+ 738   2              case 0x06:
+ 739   2                  memcpy(sata.TX1_buf,sata.RX1_buf,8);
+ 740   2      
+ 741   2                  sata.TX1_send_bytelength = length;
+ 742   2                  
+ 743   2                  break;   
+ 744   2      
+ 745   2              case 0x10:
+ 746   2                  memcpy(sata.TX1_buf,sata.RX1_buf,6);
+ 747   2              
+ 748   2                  crc = MODBUS_CRC16(sata.TX1_buf,6);
+ 749   2      
+ 750   2                  sata.TX1_buf[6] = crc;                 //CRC H
+ 751   2                  sata.TX1_buf[6] = crc>>8;              //CRC L
+ 752   2      
+ 753   2                  sata.TX1_send_bytelength = length;
+ 754   2      
+ 755   2                  break;         
+ 756   2      
+ 757   2              default:
+ 758   2                  break;
+ 759   2          }
+ 760   1          TI  = 1;                              //开始发送
+ 761   1          delay_ms(1);
+ 762   1      }
+ 763          
+ 764          /**
+ 765           * @brief       crc校验函数
+ 766           * 
+ 767           * @param   buf：  Address(1 byte) +Funtion(1 byte) ）+Data(n byte)   
+ 768           * @param   length:数据长度           
+ 769           * 
+ 770            @return  crc16:crc校验的值 2byte
+ 771           */
+ 772          uint16_t MODBUS_CRC16(uint8_t *buf, uint8_t length)
+ 773          {
+ 774   1              uint8_t i;
+ 775   1              uint16_t        crc16;
+ 776   1      
+ 777   1          /* 1, 预置16位CRC寄存器为0xffff（即全为1）                          */
+ 778   1              crc16 = 0xffff; 
+ 779   1      
+ 780   1              do
+ 781   1              {
+ 782   2              /* 2, 把8位数据与16位CRC寄存器的低位相异或，把结果放于CRC寄存器     */    
+             -    
+ 783   2                      crc16 ^= (uint16_t)*buf;                //
+ 784   2                      for(i=0; i<8; i++)              
+ 785   2                      {
+ 786   3                  /* 3, 如果最低位为1，把CRC寄存器的内容右移一位(朝低位)，用0填补最高
+             -位 再异或0xA001    */
+ 787   3                              if(crc16 & 1)
+ 788   3                  {
+ 789   4                      crc16 = (crc16 >> 1) ^ 0xA001;
+ 790   4                  }
+ 791   3                  /* 4, 如果最低位为0，把CRC寄存器的内容右移一位(朝低位)，用0填补最高
+             -位                */
+ 792   3                  else
+ 793   3                  {
+ 794   4                      crc16 >>= 1;
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/16/2025 17:04:32 PAGE 14  
+
+ 795   4                  }           
+ 796   3                      }
+ 797   2                      buf++;
+ 798   2              }while(--length != 0);
+ 799   1      
+ 800   1              return  (crc16);
+ 801   1      }
+ 802          
+ 803          void waste_ink_scan( void )
+ 804          {
+ 805   1              if( WASTE_INK == 0 )
+ 806   1              {
+ 807   2                  qdc_info.waste_ink = 0;
+ 808   2              }else
+ 809   1              {
+ 810   2                  qdc_info.waste_ink = 1;
+ 811   2              }
+ 812   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1876    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      7      15
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

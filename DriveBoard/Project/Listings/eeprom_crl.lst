@@ -1,0 +1,79 @@
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/16/2025 17:04:31 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE EEPROM_CRL
+OBJECT MODULE PLACED IN ..\Output\eeprom_crl.obj
+COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE ..\BSP\Src\eeprom_crl.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP
+                    -\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\eeprom_crl.lst) OBJECT(..\O
+                    -utput\eeprom_crl.obj)
+
+line level    source
+
+   1          #include "eeprom_crl.h"
+   2          
+   3          EEPROM_INFO eeprom;
+   4          
+   5          /**
+   6           * @brief       eeprom状态判定，是否写入过
+   7           *
+   8           * @param   
+   9           *
+  10           * @return  void
+  11          **/
+  12          void eeprom_statu_judge( void )
+  13          {
+  14   1          uint8_t eeprom_statu_flag;
+  15   1      
+  16   1          eeprom_statu_flag = ISP_Read(EEPROM_STATU_JUDGE);
+  17   1      
+  18   1          if( eeprom_statu_flag == 0xFF)
+  19   1          {
+  20   2      
+  21   2      
+  22   2              eeprom_data_record(); 
+  23   2          }
+  24   1          eeprom_data_init();    
+  25   1      }
+  26          
+  27          /**
+  28           * @brief       eeprom 数据写入
+  29           *
+  30           * @param   
+  31           *
+  32           * @return  void
+  33          **/
+  34          void eeprom_data_record( void )
+  35          {
+  36   1          ISP_Earse(0x0000);
+  37   1      
+  38   1      
+  39   1          ISP_Write(EEPROM_STATU_JUDGE,0x58);
+  40   1      }
+  41          
+  42          /**
+  43           * @brief       eeprom 数据初始化
+  44           *
+  45           * @param   
+  46           *
+  47           * @return  void
+  48          **/
+  49          void eeprom_data_init( void )
+  50          {
+  51   1          
+  52   1      }
+
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/16/2025 17:04:31 PAGE 2   
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     33    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     10    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
