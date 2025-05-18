@@ -28,8 +28,8 @@ typedef struct
 extern AC_DC ac_dc;
 
 void led_ctrl( uint8_t on_off );
-void temp_scan( void );
 void fan_ctrl( uint8_t level );
-
+void rubber_roller_ctrl( uint8_t on_off );
+void temp_scan( void );
 
 #endif

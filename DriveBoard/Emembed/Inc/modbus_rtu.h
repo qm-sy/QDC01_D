@@ -44,5 +44,7 @@ void slave_to_master_Sata(uint8_t code_num,uint8_t length);
 uint16_t MODBUS_CRC16(uint8_t *buf, uint8_t length);
 
 void waste_ink_scan( void );
+void send_to_EB_16( void );
+void send_to_EB_06( uint8_t addr, uint8_t val_H, uint8_t val_L);
 
 #endif

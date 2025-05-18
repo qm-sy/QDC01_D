@@ -29,8 +29,7 @@ void main( void )
     EA = 1;     //中断总开关
 
     eeprom_statu_judge();       //EEPROM初始化
-    qdc_info.fan_level = 3;
-    qdc_info.led_switch = 1;
+
     //printf("========== code start ========== \r\n");
 
     while (1)

@@ -6,19 +6,24 @@
 #include "power_crl.h"
 #include "ntc.h"
 #include "stdio.h"
+#include "modbus_rtu.h"
 
-#define PWM_ADDR              0x0000
-#define LED_ADDR              0x0001
-#define AC220_ADDR1           0x0002
-#define AC220_ADDR2           0x0003
-#define SYNC_ADDR             0X0004 
-#define MODE_ADDR             0X0005
-#define TEMP_ALARM            0X0006
-#define GONGLV_MIN            0X0007
-#define GONGLV_H_H            0X0008
-#define GONGLV_H_L            0X0009
+#define ROLLER_ADDR1        0x0000      //低字节：开关  
+#define ROLLER_ADDR2        0x0001      //高字节：停止温度
+#define LED_ADDR            0x0002        //开关
+#define FAN_ADDR            0x0003       //档位
+#define BOARD_ADDR1         0x0004        //低字节：开关 
+#define BOARD_ADDR2         0x0005        //高字节：停止温度
+#define INKSAC_ADDR         0X0006      //开关
+#define CIR_ADDR1           0X0007        //开关
+#define CIR_ADDR2           0X0008      //启动时间
+#define CIR_ADDR3           0X0009        //停止时间
+#define STIR_ADDR1          0X000A
+#define STIR_ADDR2          0X000B
+#define STIR_ADDR3          0X000C
+#define INK_OUT_ADDR        0X000D
 
-#define EEPROM_STATU_JUDGE    0X0010         
+#define EEPROM_STATU_JUDGE    0X000F         
 
 typedef struct 
 {

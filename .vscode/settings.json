@@ -8,6 +8,9 @@
         "eeprom_crl.h": "c",
         "tim.h": "c",
         "power_crl.h": "c",
-        "gpio.h": "c"
+        "gpio.h": "c",
+        "ntc.h": "c",
+        "string.h": "c",
+        "delay.h": "c"
     }
 }

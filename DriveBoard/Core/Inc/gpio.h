@@ -15,10 +15,28 @@
 
 typedef struct 
 {
-    uint8_t  waste_ink;                //DATA_H
-    uint8_t  thermopile_temp;                //DATA_L
-    uint8_t  fan_level;                   //BYTE NUM*2
-    uint8_t  led_switch;            //DATA1 H 位置
+    uint8_t  level_info1;
+    uint8_t  level_info2;
+    uint8_t  waste_ink;              
+    uint8_t  dht11_temp;
+    uint8_t  dht11_hum;
+    uint8_t  ntc1_temp;
+    uint8_t  thermopile_temp;                
+
+    uint8_t  roller_switch;
+    uint8_t  roller_temp;
+    uint8_t  led_switch;            
+    uint8_t  fan_level;                   
+    uint8_t  board_switch;
+    uint8_t  board_temp;
+    uint8_t  inksac_switch;
+    uint8_t  cir_switch;
+    uint8_t  cir_start_time;
+    uint8_t  cir_stop_time;
+    uint8_t  stir_switch;
+    uint8_t  stir_start_time;
+    uint8_t  stir_stop_time;
+    uint8_t  ink_out_time;
 }QDC_INFO;
 
 

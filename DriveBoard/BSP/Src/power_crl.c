@@ -32,6 +32,16 @@ void fan_ctrl( uint8_t level )
     PWMB_CCR7= level * 184;
 }
 
+void rubber_roller_ctrl( uint8_t on_off )
+{
+    if( on_off == 1)
+    {
+        AC_Out1 = 0;
+    }else
+    {
+        AC_Out1 = 1;
+    }
+}
 /**
  * @brief 温度扫描，DHT11温湿度扫描 1s/次 控制220V输出使能
  *
