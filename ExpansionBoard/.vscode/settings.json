@@ -1,0 +1,12 @@
+{
+    "files.exclude": {
+        "**/.vscode": true
+    },
+    "files.associations": {
+        "gpio.h": "c",
+        "sys.h": "c",
+        "communication.h": "c",
+        "uart.h": "c",
+        "power_crl.h": "c"
+    }
+}

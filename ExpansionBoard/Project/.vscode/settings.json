@@ -1,8 +1,0 @@
-{
-    "files.exclude": {
-        "**/.vscode": true
-    },
-    "files.associations": {
-        "stc8h.h": "c"
-    }
-}

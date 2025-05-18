@@ -4,9 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "c:/Users/qm/.vscode/extensions/richintelligent.richextension-3.1.10/include",
-                "c:/Users/qm/.vscode/extensions/richintelligent.richextension-3.1.10/include/Atmel",
-                "e:/workspace/QDC01/QDC01_D/libRich",
+                "e:/workspace/QDC01/QDC01_D/ExpansionBoard/libRich",
                 "c:/Users/qmsy/.vscode/extensions/richintelligent.richextension-3.1.10/include",
                 "c:/Users/qmsy/.vscode/extensions/richintelligent.richextension-3.1.10/include/Atmel"
             ],
