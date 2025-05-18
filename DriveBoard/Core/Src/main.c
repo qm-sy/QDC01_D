@@ -29,7 +29,7 @@ void main( void )
     EA = 1;     //中断总开关
 
     eeprom_statu_judge();       //EEPROM初始化
-
+    temp.temp_scan_flag = 0;
     //printf("========== code start ========== \r\n");
 
     while (1)

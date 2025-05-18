@@ -58,14 +58,14 @@ void temp_scan( void )
 
         Read_DHT11();
 
-        if( temp.temp_value1 >= temp.temp_alarm_value )  
-        {
-            ac_dc.ac220_out_temp_allow = 0;     
-        }else
-        {
-            ac_dc.ac220_out_temp_allow = 1;     
-        }
-
+        // if( temp.temp_value1 >= temp.temp_alarm_value )  
+        // {
+        //     ac_dc.ac220_out_temp_allow = 0;     
+        // }else
+        // {
+        //     ac_dc.ac220_out_temp_allow = 1;     
+        // }
+        
         temp.temp_scan_flag = 0;
     }
 }

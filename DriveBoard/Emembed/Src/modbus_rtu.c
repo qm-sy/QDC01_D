@@ -366,14 +366,14 @@ void Modbus_Fun4_Sata( void )
         modbus.byte_info_H = modbus.byte_info_L = 0X00;
         switch (i)
         {
-            /*  30001  NTC1、NTC2温度查询                           */
+            /*  30001  1~7通道液位信息                           */
             case 0x00:
-                modbus.byte_info_H = 0x00;
-                modbus.byte_info_L = 0x00;
+                modbus.byte_info_H = qdc_info.level_info2;
+                modbus.byte_info_L = qdc_info.level_info1;
 
                 break;
 
-            /*  30002  NTC3、NTC4温度查询                */
+            /*  30002 废墨液位信息                 */
             case 0x01:
                 waste_ink_scan();
                 modbus.byte_info_H = 0x00;
@@ -383,24 +383,23 @@ void Modbus_Fun4_Sata( void )
 
             /*  30003 环境温湿度查询                   */
             case 0x02:
+                modbus.byte_info_H = temp.dht11_humidity;
+                modbus.byte_info_L = temp.dht11_temp;
 
                 break;
 
-            /*  30004 Signal_IN状态查询                   */
+            /*  30004 NTC温度                  */
             case 0x03:
- 
+                modbus.byte_info_H = 0x00;
+                modbus.byte_info_L = temp.temp_value1;
 
                 break;
                 
-            /*  30005 运行时间（min）                   */
+            /*  30005 热电堆温度                   */
             case 0x04:
-
-                break;
-
-            /*  30006 运行时间（h）                   */
-            case 0x05:
-    
-
+                modbus.byte_info_H = 0x00;
+                modbus.byte_info_L = 25;
+                
                 break;
 
             default:
@@ -949,3 +948,4 @@ void send_to_EB_06( uint8_t addr, uint8_t val_H, uint8_t val_L)
     S4CON |= S4TI;                              //开始发送
     delay_ms(1);
 }
+
