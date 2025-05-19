@@ -6,7 +6,7 @@ void main( void )
     
     GPIO_Init();
     output_statu_init();
-
+    level_info_init();
     /*  调试使用 printf  */
     Uart3_Init();
 
@@ -32,11 +32,11 @@ void main( void )
     printf("========== code start ========== \r\n");
 
     delay_ms(5);
-    board_ctrl(1);
+    board_ctrl();
     inksac_ctrl(1);
     while (1)
     {
         Modbus_Event();
         temp_scan();
-    }  
+    }
 }

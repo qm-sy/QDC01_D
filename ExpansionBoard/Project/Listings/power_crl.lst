@@ -1,17 +1,17 @@
-C51 COMPILER V9.60.7.0   POWER_CRL                                                         05/18/2025 23:50:41 PAGE 1   
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         05/19/2025 16:57:42 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE POWER_CRL
 OBJECT MODULE PLACED IN ..\Output\power_crl.obj
-COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\BSP\Src\power_crl.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\B
-                    -SP\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\power_crl.lst) OBJECT(..\
-                    -Output\power_crl.obj)
+COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE ..\BSP\Src\power_crl.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP\
+                    -Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\power_crl.lst) OBJECT(..\Out
+                    -put\power_crl.obj)
 
 line level    source
 
    1          #include "power_crl.h"
    2          
-   3          AC_DC ac_dc;
+   3          DC_CTRL dc_ctrl;
    4          
    5          
    6          /**
@@ -25,11 +25,11 @@ line level    source
   14          {
   15   1          if( device  == CIR_CTRL )
   16   1          {
-  17   2              PWMB_CCR7= level * 184;
+  17   2              PWMB_CCR7= 1104 - level * 184;
   18   2          }
   19   1          if( device == STIR_CTRL )
   20   1          {
-  21   2              PWMB_CCR8= level * 184;
+  21   2              PWMB_CCR8= 1104 - level * 184;
   22   2          }
   23   1      }
   24          
@@ -37,64 +37,66 @@ line level    source
   26          {
   27   1          DC24_1 = DC24_2 = DC24_3 = 0;
   28   1          DC_PWM1 = DC_PWM2 = 1;
-  29   1      }
-  30          /**
-  31           * @brief 温度扫描，DHT11温湿度扫描 1s/次 控制220V输出使能
-  32           *
-  33           * @param[in] 
-  34           * 
-  35           * @return  
+  29   1          dc_ctrl.cir_level = 0;
+  30   1          dc_ctrl.stir_level = 0;
+  31   1      }
+  32          /**
+  33           * @brief 温度扫描，DHT11温湿度扫描 1s/次 控制220V输出使能
+  34           *
+  35           * @param[in] 
   36           * 
-  37          **/
-  38          void temp_scan( void )
-  39          {
-  40   1          if( temp.temp_scan_flag == 1)
-  41   1          {
-  42   2              temp.temp_value1 =  get_temp(NTC);
-  43   2      
-  44   2              Read_DHT11();
+  37           * @return  
+  38           * 
+  39          **/
+  40          void temp_scan( void )
+  41          {
+  42   1          if( temp.temp_scan_flag == 1)
+  43   1          {
+  44   2              temp.temp_value1 =  get_temp(NTC);
   45   2      
-  46   2              // if( temp.temp_value1 >= temp.temp_alarm_value )  
-  47   2              // {
-  48   2              //     ac_dc.ac220_out_temp_allow = 0;     
-  49   2              // }else
-  50   2              // {
-  51   2              //     ac_dc.ac220_out_temp_allow = 1;     
-  52   2              // }
-  53   2              
-C51 COMPILER V9.60.7.0   POWER_CRL                                                         05/18/2025 23:50:41 PAGE 2   
+  46   2              Read_DHT11();
+  47   2      
+  48   2              board_ctrl();
+  49   2              
+  50   2              temp.temp_scan_flag = 0;
+  51   2          }
+  52   1      }
+  53          
+C51 COMPILER V9.60.7.0   POWER_CRL                                                         05/19/2025 16:57:42 PAGE 2   
 
-  54   2              temp.temp_scan_flag = 0;
-  55   2          }
-  56   1      }
-  57          
-  58          void board_ctrl( uint8_t on_off )
-  59          {
-  60   1          if( on_off == 1 )
-  61   1          {
-  62   2              DC24_1 = 1;
-  63   2          }else
-  64   1          {
-  65   2              DC24_1 = 0;
-  66   2          }
-  67   1      }
-  68          
-  69          void inksac_ctrl( uint8_t on_off )
-  70          {
-  71   1          if( on_off == 1 )
-  72   1          {
-  73   2              DC24_2 = 1;
-  74   2          }else
-  75   1          {
-  76   2              DC24_2 = 0;
-  77   2          }
-  78   1      }
+  54          void board_ctrl()
+  55          {
+  56   1          if( dc_ctrl.board_out_allow == 1 )
+  57   1          {
+  58   2              if( temp.temp_value1 < dc_ctrl.board_alarm_temp )  
+  59   2              {
+  60   3                  DC24_1 = 1;   
+  61   3              }else
+  62   2              {
+  63   3                  DC24_1 = 0;
+  64   3              }
+  65   2          }else
+  66   1          {
+  67   2              DC24_1 = 0;
+  68   2          }
+  69   1      }
+  70          
+  71          void inksac_ctrl( uint8_t on_off )
+  72          {
+  73   1          if( on_off == 1 )
+  74   1          {
+  75   2              DC24_2 = 1;
+  76   2          }else
+  77   1          {
+  78   2              DC24_2 = 0;
+  79   2          }
+  80   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     98    ----
+   CODE SIZE        =    139    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =     11    ----
+   XDATA SIZE       =     12    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

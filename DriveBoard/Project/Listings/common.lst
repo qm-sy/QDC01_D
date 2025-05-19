@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   COMMON                                                            05/18/2025 12:14:17 PAGE 1   
+C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 16:23:09 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMON
@@ -22,7 +22,7 @@ line level    source
   11          {
   12   1      
   13   1          static uint16_t temp_scan_cnt = 0;
-  14   1      
+  14   1          static uint16_t scan_04_cnt = 0;
   15   1          /* 1, temp 上报 1s/次                             */
   16   1          if( temp.temp_scan_flag == 0 )
   17   1          {
@@ -33,13 +33,22 @@ line level    source
   22   3                  temp_scan_cnt = 0;
   23   3              }
   24   2          }
-  25   1      }
+  25   1          if( rs485.scan_04_flag == 0 )
+  26   1          {
+  27   2              scan_04_cnt++;
+  28   2              if( scan_04_cnt == 100 )
+  29   2              {
+  30   3                  scan_04_cnt = 0;
+  31   3                  rs485.scan_04_flag = 1;
+  32   3              }
+  33   2          }
+  34   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     57    ----
+   CODE SIZE        =    100    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =      2    ----
+   XDATA SIZE       =      4    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

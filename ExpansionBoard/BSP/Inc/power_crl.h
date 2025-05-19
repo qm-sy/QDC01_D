@@ -14,24 +14,21 @@
 
 typedef struct 
 {
-    uint8_t  zero_flag;             //220V输入触发标志位
-    uint16_t time_delay;            //移相延时
-    uint8_t  ac220_out1_enable;     //通道1输出使能
-    uint8_t  ac220_out2_enable;     //通道2输出使能
-    uint8_t  ac220_out3_enable;     //通道3输出使能
-    uint8_t  ac220_out_temp_allow;  //3路通道温度检测低于报警温度时方可输出
-    uint8_t  sync_flag;             //同步标志位
-    uint8_t  mode_info;             //模式选择
+    uint8_t  board_out_allow;
+    uint8_t  board_alarm_temp;
+    uint16_t cir_start_time;
+    uint16_t cir_stop_time;
+    uint16_t stir_start_time;
+    uint16_t stir_stop_time;  
+    uint8_t  cir_level;
+    uint8_t  stir_level;
+}DC_CTRL;
 
-    uint8_t signal_in_flag;         //24V输入检测
-    uint8_t ac220_flag;             //220V输入检测
-}AC_DC;
-
-extern AC_DC ac_dc;
+extern DC_CTRL dc_ctrl;
 
 void output_statu_init( void );
 void pwm_ctrl( uint8_t device, uint8_t level );
-void board_ctrl( uint8_t on_off );
+void board_ctrl();
 void inksac_ctrl( uint8_t on_off );
 void rubber_roller_ctrl( uint8_t on_off );
 void temp_scan( void );

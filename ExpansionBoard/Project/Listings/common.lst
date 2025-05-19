@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   COMMON                                                            05/18/2025 23:50:41 PAGE 1   
+C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 16:57:42 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMON
 OBJECT MODULE PLACED IN ..\Output\common.obj
-COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\Emembed\Src\common.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\
-                    -BSP\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\common.lst) OBJECT(..\Ou
-                    -tput\common.obj)
+COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE ..\Emembed\Src\common.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP
+                    -\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\common.lst) OBJECT(..\Outpu
+                    -t\common.obj)
 
 line level    source
 
@@ -22,26 +22,176 @@ line level    source
   11          {
   12   1      
   13   1          static uint16_t temp_scan_cnt = 0;
-  14   1      
-  15   1          /* 1, temp 上报 1s/次                             */
-  16   1          if( temp.temp_scan_flag == 0 )
-  17   1          {
-  18   2              temp_scan_cnt++;
-  19   2              if( temp_scan_cnt == 100 )
-  20   2              {
-  21   3                  temp.temp_scan_flag = 1;
-  22   3                  temp_scan_cnt = 0;
-  23   3              }
-  24   2          }
-  25   1      }
+  14   1          static uint16_t level1_cnt = 0;
+  15   1          static uint16_t level2_cnt = 0;
+  16   1          static uint16_t level3_cnt = 0;
+  17   1          static uint16_t level4_cnt = 0;
+  18   1          static uint16_t level5_cnt = 0;
+  19   1          static uint16_t level6_cnt = 0;
+  20   1          static uint16_t level7_cnt = 0;
+  21   1          static uint16_t cir_delay_cnt  = 0;
+  22   1          static uint16_t stir_delay_cnt = 0;
+  23   1          /* 1, temp 上报 1s/次                             */
+  24   1          if( temp.temp_scan_flag == 0 )
+  25   1          {
+  26   2              temp_scan_cnt++;
+  27   2              if( temp_scan_cnt == 100 )
+  28   2              {
+  29   3                  temp.temp_scan_flag = 1;
+  30   3                  temp_scan_cnt = 0;
+  31   3              }
+  32   2          }
+  33   1          /* 2, LEVEL Scan                            */
+  34   1          /* 2.1, LEVEL   1                          */
+  35   1          if( level1_H == 0 )
+  36   1          {
+  37   2              level1_cnt++;
+  38   2              if( level1_cnt >= level.level_delay )
+  39   2              {
+  40   3                  level1_cnt = 0;
+  41   3                  level.level1_down_flag = 1;
+  42   3              }
+  43   2          }else
+  44   1          {
+  45   2              level1_cnt = 0;
+  46   2              level.level1_down_flag = 0;
+  47   2          }
+  48   1      
+  49   1          /* 2.2, LEVEL   2                          */
+  50   1          if( level2_H == 0 )
+  51   1          {
+  52   2              level2_cnt++;
+  53   2              if( level2_cnt >= level.level_delay )
+C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 16:57:42 PAGE 2   
+
+  54   2              {
+  55   3                  level2_cnt = 0;
+  56   3                  level.level2_down_flag = 1;
+  57   3              }
+  58   2          }else
+  59   1          {
+  60   2              level2_cnt = 0;
+  61   2              level.level2_down_flag = 0;
+  62   2          }
+  63   1      
+  64   1          /* 2.3, LEVEL   3                          */
+  65   1          if( level3_H == 0 )
+  66   1          {
+  67   2              level3_cnt++;
+  68   2              if( level3_cnt >= level.level_delay )
+  69   2              {
+  70   3                  level3_cnt = 0;
+  71   3                  level.level3_down_flag = 1;
+  72   3              }
+  73   2          }else
+  74   1          {
+  75   2              level3_cnt = 0;
+  76   2              level.level3_down_flag = 0;
+  77   2          }
+  78   1          /* 2.4, LEVEL   1                          */
+  79   1          if( level4_H == 0 )
+  80   1          {
+  81   2              level4_cnt++;
+  82   2              if( level4_cnt >= level.level_delay )
+  83   2              {
+  84   3                  level4_cnt = 0;
+  85   3                  level.level4_down_flag = 1;
+  86   3              }
+  87   2          }else
+  88   1          {
+  89   2              level4_cnt = 0;
+  90   2              level.level4_down_flag = 0;
+  91   2          }
+  92   1      
+  93   1          /* 2.5, LEVEL   2                          */
+  94   1          if( level5_H == 0 )
+  95   1          {
+  96   2              level5_cnt++;
+  97   2              if( level5_cnt >= level.level_delay )
+  98   2              {
+  99   3                  level5_cnt = 0;
+ 100   3                  level.level5_down_flag = 1;
+ 101   3              }
+ 102   2          }else
+ 103   1          {
+ 104   2              level5_cnt = 0;
+ 105   2              level.level5_down_flag = 0;
+ 106   2          }
+ 107   1      
+ 108   1          /* 2.6, LEVEL   3                          */
+ 109   1          if( level6_H == 0 )
+ 110   1          {
+ 111   2              level6_cnt++;
+ 112   2              if( level6_cnt >= level.level_delay )
+ 113   2              {
+ 114   3                  level6_cnt = 0;
+ 115   3                  level.level6_down_flag = 1;
+C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 16:57:42 PAGE 3   
+
+ 116   3              }
+ 117   2          }else
+ 118   1      
+ 119   1          {
+ 120   2              level6_cnt = 0;
+ 121   2              level.level6_down_flag = 0;
+ 122   2          }
+ 123   1      
+ 124   1          /* 2.7, LEVEL   3                          */
+ 125   1          if( level7_H == 0 )
+ 126   1          {
+ 127   2              level7_cnt++;
+ 128   2              if( level7_cnt >= level.level_delay )
+ 129   2              {
+ 130   3                  level7_cnt = 0;
+ 131   3                  level.level7_down_flag = 1;
+ 132   3              }
+ 133   2          }else
+ 134   1          {
+ 135   2              level7_cnt = 0;
+ 136   2              level.level7_down_flag = 0;
+ 137   2          }
+ 138   1      
+ 139   1          /* 3. 循环和搅拌电机延时 */
+ 140   1          cir_delay_cnt++;
+ 141   1          stir_delay_cnt++;
+ 142   1          if( cir_delay_cnt <= dc_ctrl.cir_start_time )
+ 143   1          {
+ 144   2              pwm_ctrl(CIR_CTRL,dc_ctrl.cir_level);
+ 145   2          }
+ 146   1          if((cir_delay_cnt < (dc_ctrl.cir_start_time + dc_ctrl.cir_stop_time)) && ( cir_delay_cnt > dc_ctrl.cir
+             -_start_time ))
+ 147   1          {
+ 148   2              pwm_ctrl(CIR_CTRL,0);
+ 149   2          }
+ 150   1          if(cir_delay_cnt >= (dc_ctrl.cir_start_time + dc_ctrl.cir_stop_time))
+ 151   1          {
+ 152   2              cir_delay_cnt = 0;
+ 153   2          }
+ 154   1      
+ 155   1          if( stir_delay_cnt <= dc_ctrl.stir_start_time )
+ 156   1          {
+ 157   2              pwm_ctrl(CIR_CTRL,dc_ctrl.stir_level);
+ 158   2          }
+ 159   1          if((stir_delay_cnt < (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time)) && ( stir_delay_cnt > dc_ctrl
+             -.stir_start_time ))
+ 160   1          {
+ 161   2              pwm_ctrl(CIR_CTRL,0);
+ 162   2          }
+ 163   1          if(stir_delay_cnt >= (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time))
+ 164   1          {
+ 165   2              stir_delay_cnt = 0;
+ 166   2          }
+ 167   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     57    ----
+   CODE SIZE        =    780    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =      2    ----
+   XDATA SIZE       =     20    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
+C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 16:57:42 PAGE 4   
+
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.

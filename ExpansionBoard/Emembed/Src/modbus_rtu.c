@@ -2,8 +2,6 @@
 
 MODBIS_INFO modbus;
 
-uint8_t level_info_L = 0;
-uint8_t level_info_H = 0;
 /**
  * @brief	modbus_rtu  无奇偶校验
  *
@@ -153,39 +151,30 @@ void Modbus_Fun4( void )
         modbus.byte_info_H = modbus.byte_info_L = 0X00;
         switch (i)
         {
-            /*  30001  NTC1、NTC2温度查询                           */
+            /*  30001  1~7通道液位信息                        */
             case 0x00:
                 ink_scan();
-                modbus.byte_info_H = level_info_H;
-                modbus.byte_info_L = level_info_L;
+                modbus.byte_info_H = level.level_info_H;
+                modbus.byte_info_L = level.level_info_L;
                 break;
 
-            /*  30002  NTC3、NTC4温度查询                */
+            /*  30002                 */
             case 0x01:
-
+                modbus.byte_info_H = 0x00;
+                modbus.byte_info_L = 0x00;
 
                 break;
 
-            /*  30003 环境温湿度查询                   */
+            /*  30003 温湿度                   */
             case 0x02:
-
+                modbus.byte_info_H = temp.dht11_humidity;
+                modbus.byte_info_L = temp.dht11_temp;
                 break;
 
-            /*  30004 Signal_IN状态查询                   */
+            /*  30004 NTC1 温度                   */
             case 0x03:
- 
-
-                break;
-                
-            /*  30005 运行时间（min）                   */
-            case 0x04:
-
-                break;
-
-            /*  30006 运行时间（h）                   */
-            case 0x05:
-    
-
+                modbus.byte_info_H = 0x00;
+                modbus.byte_info_L = temp.temp_value1;
                 break;
 
             default:
@@ -226,27 +215,42 @@ void Modbus_Fun6( void )
             break;  
             
         /*  40004  底板加热                   */
-        case 0x03:                                         
-            board_ctrl(rs485.RX4_buf[5]);
+        case 0x03:   
+            dc_ctrl.board_alarm_temp = rs485.RX4_buf[4];                                   
+            dc_ctrl.board_out_allow = rs485.RX4_buf[5];
 
             break;
 
         /*  40005  墨囊加热                   */
         case 0x04:                                         
             inksac_ctrl(rs485.RX4_buf[5]);
+
             break;
 
-        /*  40006  循环控制                   */
-        case 0x05:                                         
-            pwm_ctrl(CIR_CTRL,rs485.RX4_buf[5]);
+        /*  40006  循环控制                  */
+        case 0x05:                  
+            dc_ctrl.cir_start_time = ((rs485.RX4_buf[5] >> 3) | ((rs485.RX4_buf[4] & 0x01) << 5)) * 100;     
+            dc_ctrl.cir_stop_time  = (rs485.RX4_buf[4] >> 1) * 100;  
+            dc_ctrl.cir_level = rs485.RX4_buf[5]&0x07;           
+            pwm_ctrl(CIR_CTRL,dc_ctrl.cir_level);
+
             break;
 
         /*  40007  搅拌控制                   */
         case 0x06:  
-            pwm_ctrl(STIR_CTRL,rs485.RX4_buf[5]);
+            dc_ctrl.stir_start_time = ((rs485.RX4_buf[5] >> 3) | ((rs485.RX4_buf[4] & 0x01) << 5)) * 100;     
+            dc_ctrl.stir_stop_time  = (rs485.RX4_buf[4] >> 1) * 100;   
+            dc_ctrl.stir_level = rs485.RX4_buf[5]&0x07;  
+            pwm_ctrl(STIR_CTRL,dc_ctrl.stir_level);
 
             break;
-            
+
+        /*  40007  缺墨延时时间                   */
+        case 0x07:  
+            level.level_delay = rs485.RX4_buf[5] * 100;
+
+            break;    
+
         default:
             break;   
     }
@@ -277,41 +281,41 @@ void Modbus_Fun16( void )
         modbus.byte_info_L = rs485.RX4_buf[modbus.rcv_value_addr + 1];
         switch (i)
         {
-            /*  40001  风速设置                 */
-            case 0x00:
-
-                break;
-            
-            /*  40002  LED 开关状态设置                          */
-            case 0x01:
-
+                /*  40001  底板加热                      */
+            case 0x00:                  
+                dc_ctrl.board_alarm_temp = modbus.byte_info_H;                                   
+                dc_ctrl.board_out_allow = modbus.byte_info_L;
                 break;
 
-            /*  40003 三路220V输出使能设置                          */
-            case 0x02:
-
+            /*  40002     墨囊加热                              */
+            case 0x01:                                         
+                inksac_ctrl(modbus.byte_info_L);
 
                 break;
 
-            
-            /*  40004  同步状态设置                   */
-            case 0x03:
-
+            /*  40003    循环控制                         */
+            case 0x02:                                         
+                dc_ctrl.cir_start_time = ((modbus.byte_info_L >> 3) | ((modbus.byte_info_H & 0x01) << 5)) * 100;     
+                dc_ctrl.cir_stop_time  = (modbus.byte_info_H >> 1) * 100;    
+                dc_ctrl.cir_level = modbus.byte_info_L & 0x07;            
+                pwm_ctrl(CIR_CTRL,dc_ctrl.cir_level);
+                break;  
+                
+            /*  40004  搅拌控制                   */
+            case 0x03:   
+                dc_ctrl.stir_start_time = ((modbus.byte_info_L >> 3) | ((modbus.byte_info_H & 0x01) << 5)) * 100;  
+                dc_ctrl.stir_stop_time  = (modbus.byte_info_H >> 1) * 100;   
+                dc_ctrl.stir_level = modbus.byte_info_L & 0x07;
+                pwm_ctrl(STIR_CTRL,dc_ctrl.stir_level);
 
                 break;
 
-            /*  40005  工作模式设置                   */
+            /*  40005  缺墨延时时间                   */
             case 0x04:                                         
-
+                level.level_delay = modbus.byte_info_L * 100;
 
                 break;
 
-            /*  40006  报警温度设置                   */
-            case 0x05:                                         
-
-                
-                break;
-                
             default:
                 break;
         }
@@ -423,84 +427,4 @@ uint16_t MODBUS_CRC16(uint8_t *buf, uint8_t length)
 	}while(--length != 0);
 
 	return	(crc16);
-}
-
-void ink_scan( void )
-{
-    /*  LEVEL    1   */
-    if( level1_H == 0 )
-    {
-        level_info_L &= 0xFC;
-        level_info_L |= 0X02;
-    }else
-    {
-        level_info_L &= 0xFC;
-        level_info_L |= 0X03;
-    }
-
-    /*  LEVEL    2   */
-    if( level2_H == 0 )
-    {
-        level_info_L &= 0xF3;
-        level_info_L |= 0X08;
-    }else
-    {
-        level_info_L &= 0xF3;
-        level_info_L |= 0X0C;
-    }
-    
-    /*  LEVEL    3   */
-    if( level3_H == 0 )
-    {
-        level_info_L &= 0xCF;
-        level_info_L |= 0X20;
-    }else
-    {
-        level_info_L &= 0xCF;
-        level_info_L |= 0X30;
-    }
-    
-    /*  LEVEL    4   */
-    if( level4_H == 0 )
-    {
-        level_info_L &= 0x3F;
-        level_info_L |= 0X80;
-    }else
-    {
-        level_info_L &= 0x3F;
-        level_info_L |= 0XC0;
-    }
-    
-    /*  LEVEL    5   */
-    if( level5_L == 0 )
-    {
-        level_info_H &= 0xFC;
-        level_info_H |= 0X02;
-    }else
-    {
-        level_info_H &= 0xFC;
-        level_info_H |= 0X03;
-    }
-    
-    /*  LEVEL    6   */
-    if( level6_L == 0 )
-    {
-        level_info_H &= 0xF3;
-        level_info_H |= 0X08;
-    }else
-    {
-        level_info_H &= 0xF3;
-        level_info_H |= 0X0C;
-    }
-    
-    /*  LEVEL    7   */
-    if( level7_L == 0 )
-    {
-        level_info_H &= 0xCF;
-        level_info_H |= 0X20;
-    }else
-    {
-        level_info_H &= 0xCF;
-        level_info_H |= 0X30;
-    }
 }

@@ -19,6 +19,8 @@ typedef struct
     uint16_t    RX4_rev_timeout;        //接收超时
     uint8_t     RX4_rev_cnt;            //接收计数
     uint8_t     DR_Flag;                //DR
+    uint8_t     scan_04_flag;
+    uint8_t     connect_flag;
 }RS485;
 
 typedef struct 

@@ -5,7 +5,6 @@
 #include "gpio.h"
 #include "ntc.h"
 #include "eeprom_crl.h"
-#include "dht11.h"
 
 #define FAN_ON    1
 #define FAN_OFF   0

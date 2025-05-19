@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/18/2025 12:14:17 PAGE 1   
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/19/2025 16:23:09 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE EEPROM_CRL
@@ -62,7 +62,7 @@ line level    source
   51          {
   52   1          ISP_Earse(0x0000);
   53   1      
-C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/18/2025 12:14:17 PAGE 2   
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/19/2025 16:23:09 PAGE 2   
 
   54   1          ISP_Write(ROLLER_ADDR1,qdc_info.roller_switch);
   55   1          ISP_Write(ROLLER_ADDR2,qdc_info.roller_temp);
@@ -119,16 +119,15 @@ line level    source
  106   1          qdc_info.stir_stop_time = ISP_Read(STIR_ADDR3);
  107   1      
  108   1          qdc_info.ink_out_time = ISP_Read(INK_OUT_ADDR);
- 109   1          send_to_EB_16();
- 110   1      }
+ 109   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    438    ----
+   CODE SIZE        =    436    ----
    CONSTANT SIZE    =   ----    ----
-C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/18/2025 12:14:17 PAGE 3   
-
    XDATA SIZE       =     10    ----
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/19/2025 16:23:09 PAGE 3   
+
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

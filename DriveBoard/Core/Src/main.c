@@ -29,7 +29,15 @@ void main( void )
     EA = 1;     //中断总开关
 
     eeprom_statu_judge();       //EEPROM初始化
+    while (rs485.connect_flag == 0)
+    {
+        send_to_EB_16();
+        Modbus_Event_485();
+        delay_ms(10);
+    }
+    
     temp.temp_scan_flag = 0;
+    delay_ms(20);
     //printf("========== code start ========== \r\n");
 
     while (1)
@@ -37,5 +45,11 @@ void main( void )
         Modbus_Event_485();
         Modbus_Event_Sata();
         temp_scan();
+        if( rs485.scan_04_flag == 1 )
+        {
+            send_to_EB_04();
+            rs485.scan_04_flag = 0;
+        }
+        
     }  
 }

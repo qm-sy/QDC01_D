@@ -461,6 +461,11 @@
               <FileType>1</FileType>
               <FilePath>..\BSP\Src\power_crl.c</FilePath>
             </File>
+            <File>
+              <FileName>level.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\Src\level.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

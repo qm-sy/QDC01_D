@@ -46,5 +46,6 @@ uint16_t MODBUS_CRC16(uint8_t *buf, uint8_t length);
 void waste_ink_scan( void );
 void send_to_EB_16( void );
 void send_to_EB_06( uint8_t addr, uint8_t val_H, uint8_t val_L);
+void send_to_EB_04( void );
 
 #endif

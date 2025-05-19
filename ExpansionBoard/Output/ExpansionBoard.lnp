@@ -10,6 +10,7 @@
 "..\Output\dht11.obj",
 "..\Output\ntc.obj",
 "..\Output\power_crl.obj",
+"..\Output\level.obj",
 "..\Output\common.obj",
 "..\Output\modbus_rtu.obj" 
 TO "..\Output\ExpansionBoard" 

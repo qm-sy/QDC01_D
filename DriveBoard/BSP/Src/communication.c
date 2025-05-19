@@ -22,6 +22,8 @@ void Uart4_Send_Statu_Init( void )
     rs485.RX4_rev_timeout = 0;
     rs485.RX4_rev_cnt = 0;
     DR_485 = 0;
+    rs485.scan_04_flag = 1;
+    rs485.connect_flag = 0;
 }
 
 /**

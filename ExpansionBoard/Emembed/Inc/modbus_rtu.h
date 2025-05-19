@@ -5,6 +5,7 @@
 #include "ntc.h"
 #include "gpio.h"
 #include "power_crl.h"
+#include "level.h"
 
 #define ADDR_EB     0xEB
 

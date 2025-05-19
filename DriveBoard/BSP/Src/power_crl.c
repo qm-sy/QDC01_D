@@ -54,9 +54,6 @@ void temp_scan( void )
 {
     if( temp.temp_scan_flag == 1)
     {
-        temp.temp_value1 =  get_temp(NTC);
-
-        Read_DHT11();
 
         // if( temp.temp_value1 >= temp.temp_alarm_value )  
         // {

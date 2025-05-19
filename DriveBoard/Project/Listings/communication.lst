@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     05/18/2025 12:14:17 PAGE 1   
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     05/19/2025 16:23:09 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMUNICATION
@@ -33,214 +33,216 @@ line level    source
   22   1          rs485.RX4_rev_timeout = 0;
   23   1          rs485.RX4_rev_cnt = 0;
   24   1          DR_485 = 0;
-  25   1      }
-  26          
-  27          /**
-  28           * @brief       串口4调用结构体 rs485 初始化
-  29           *
-  30           * @param   
+  25   1          rs485.scan_04_flag = 1;
+  26   1          rs485.connect_flag = 0;
+  27   1      }
+  28          
+  29          /**
+  30           * @brief       串口4调用结构体 rs485 初始化
   31           *
-  32           * @return  void
-  33          **/
-  34          void Uart1_Send_Statu_Init( void )
-  35          {
-  36   1          sata.RX1_rev_end_Flag = 0;
-  37   1          sata.TX1_buf[128] = 0;
-  38   1          sata.RX1_buf[128] = 0;
-  39   1          sata.TX1_send_bytelength = 0;
-  40   1          sata.TX1_send_cnt = 0;
-  41   1          sata.RX1_rev_timeout = 0;
-  42   1          sata.RX1_rev_cnt = 0;
-  43   1      }
-  44          
-  45          /**
-  46           * @brief       串口4中断处理函数
-  47           *
-  48           * @param   
+  32           * @param   
+  33           *
+  34           * @return  void
+  35          **/
+  36          void Uart1_Send_Statu_Init( void )
+  37          {
+  38   1          sata.RX1_rev_end_Flag = 0;
+  39   1          sata.TX1_buf[128] = 0;
+  40   1          sata.RX1_buf[128] = 0;
+  41   1          sata.TX1_send_bytelength = 0;
+  42   1          sata.TX1_send_cnt = 0;
+  43   1          sata.RX1_rev_timeout = 0;
+  44   1          sata.RX1_rev_cnt = 0;
+  45   1      }
+  46          
+  47          /**
+  48           * @brief       串口4中断处理函数
   49           *
-  50           * @return  void
-  51          **/
-  52          void Uart4_ISR() interrupt 18 
-  53          {   
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     05/18/2025 12:14:17 PAGE 2   
+  50           * @param   
+  51           *
+  52           * @return  void
+  53          **/
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     05/19/2025 16:23:09 PAGE 2   
 
-  54   1      
-  55   1          /* 1, 检测到S4TI置1，即发送完毕                       */
-  56   1          if( S4CON & S4TI )          //
-  57   1          {
-  58   2              /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
-  59   2              S4CON &= ~S4TI;         
-  60   2              
-  61   2              /* 3, 依次将TX4_buf中数据送出（写S4BUF操作即为发送）    */
-  62   2              if( rs485.TX4_send_bytelength != 0 )
-  63   2              {
-  64   3                  S4BUF = rs485.TX4_buf[rs485.TX4_send_cnt++];
-  65   3                  rs485.TX4_send_bytelength--;
-  66   3              }else
-  67   2              {
-  68   3                  rs485.TX4_send_cnt = 0;
-  69   3                  DR_485 = 0;
-  70   3              }
-  71   2          }
-  72   1          
-  73   1          /* 1, 检测到S2RI置1，即接收完毕                       */
-  74   1          if( S4CON & S4RI )
-  75   1          {
-  76   2              /* 2, 软件将S2RI清零，等待接收标志位重置，可继续发送    */
-  77   2              S4CON &= ~S4RI;
-  78   2              /* 3, 判断数据包是否接收完毕                           */
-  79   2              if( !rs485.RX4_rev_end_Flag )
-  80   2              {
-  81   3                  /* 4, 数据包大于RX_buf 则从头计数                  */
-  82   3                  if( rs485.RX4_rev_cnt > 128 )
-  83   3                  {
-  84   4                      rs485.RX4_rev_cnt = 0;
-  85   4                  }
-  86   3      
-  87   3                  /* 5, 依次将RX4_buf中数据接收（读S2BUF操作即为接收）*/
-  88   3                  rs485.RX4_buf[rs485.RX4_rev_cnt] = S4BUF;
-  89   3                  rs485.RX4_rev_cnt++;
-  90   3              }
-  91   2              /* 6, 重置接收完毕判断时间                              */
-  92   2              rs485.RX4_rev_timeout = 5;
-  93   2          }
-  94   1      }
-  95          
-  96          
-  97          /**
-  98           * @brief       串口1中断处理函数
-  99           *
- 100           * @param   
+  54          void Uart4_ISR() interrupt 18 
+  55          {   
+  56   1      
+  57   1          /* 1, 检测到S4TI置1，即发送完毕                       */
+  58   1          if( S4CON & S4TI )          //
+  59   1          {
+  60   2              /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
+  61   2              S4CON &= ~S4TI;         
+  62   2              
+  63   2              /* 3, 依次将TX4_buf中数据送出（写S4BUF操作即为发送）    */
+  64   2              if( rs485.TX4_send_bytelength != 0 )
+  65   2              {
+  66   3                  S4BUF = rs485.TX4_buf[rs485.TX4_send_cnt++];
+  67   3                  rs485.TX4_send_bytelength--;
+  68   3              }else
+  69   2              {
+  70   3                  rs485.TX4_send_cnt = 0;
+  71   3                  DR_485 = 0;
+  72   3              }
+  73   2          }
+  74   1          
+  75   1          /* 1, 检测到S2RI置1，即接收完毕                       */
+  76   1          if( S4CON & S4RI )
+  77   1          {
+  78   2              /* 2, 软件将S2RI清零，等待接收标志位重置，可继续发送    */
+  79   2              S4CON &= ~S4RI;
+  80   2              /* 3, 判断数据包是否接收完毕                           */
+  81   2              if( !rs485.RX4_rev_end_Flag )
+  82   2              {
+  83   3                  /* 4, 数据包大于RX_buf 则从头计数                  */
+  84   3                  if( rs485.RX4_rev_cnt > 128 )
+  85   3                  {
+  86   4                      rs485.RX4_rev_cnt = 0;
+  87   4                  }
+  88   3      
+  89   3                  /* 5, 依次将RX4_buf中数据接收（读S2BUF操作即为接收）*/
+  90   3                  rs485.RX4_buf[rs485.RX4_rev_cnt] = S4BUF;
+  91   3                  rs485.RX4_rev_cnt++;
+  92   3              }
+  93   2              /* 6, 重置接收完毕判断时间                              */
+  94   2              rs485.RX4_rev_timeout = 5;
+  95   2          }
+  96   1      }
+  97          
+  98          
+  99          /**
+ 100           * @brief       串口1中断处理函数
  101           *
- 102           * @return  void
- 103          **/
- 104          void Uart1_ISR() interrupt 4 
- 105          {   
- 106   1          /* 1, 检测到S4TI置1，即发送完毕                       */
- 107   1          if( TI == 1 )          //
- 108   1          {
- 109   2              /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
- 110   2              TI = 0;         
- 111   2              
- 112   2              /* 3, 依次将TX4_buf中数据送出（写S4BUF操作即为发送）    */
- 113   2              if( sata.TX1_send_bytelength != 0 )
- 114   2              {
- 115   3                  SBUF = sata.TX1_buf[sata.TX1_send_cnt++];
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     05/18/2025 12:14:17 PAGE 3   
+ 102           * @param   
+ 103           *
+ 104           * @return  void
+ 105          **/
+ 106          void Uart1_ISR() interrupt 4 
+ 107          {   
+ 108   1          /* 1, 检测到S4TI置1，即发送完毕                       */
+ 109   1          if( TI == 1 )          //
+ 110   1          {
+ 111   2              /* 2, 软件将S4TI清零，等待发送标志位重置，可继续发送    */
+ 112   2              TI = 0;         
+ 113   2              
+ 114   2              /* 3, 依次将TX4_buf中数据送出（写S4BUF操作即为发送）    */
+ 115   2              if( sata.TX1_send_bytelength != 0 )
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     05/19/2025 16:23:09 PAGE 3   
 
- 116   3                  sata.TX1_send_bytelength--;
- 117   3              }else
- 118   2              {
- 119   3                  sata.TX1_send_cnt = 0;
- 120   3              }
- 121   2          }
- 122   1          
- 123   1          /* 1, 检测到S2RI置1，即接收完毕                       */
- 124   1          if( RI == 1 )
- 125   1          {
- 126   2              /* 2, 软件将S2RI清零，等待接收标志位重置，可继续发送    */
- 127   2              RI = 0;
- 128   2              /* 3, 判断数据包是否接收完毕                           */
- 129   2              if( !sata.RX1_rev_end_Flag )
- 130   2              {
- 131   3                  /* 4, 数据包大于RX_buf 则从头计数                  */
- 132   3                  if( sata.RX1_rev_cnt > 128 )
- 133   3                  {
- 134   4                      sata.RX1_rev_cnt = 0;
- 135   4                  }
- 136   3      
- 137   3                  /* 5, 依次将RX4_buf中数据接收（读S2BUF操作即为接收）*/
- 138   3                  sata.RX1_buf[sata.RX1_rev_cnt] = SBUF;
- 139   3                  sata.RX1_rev_cnt++;
- 140   3              }
- 141   2              /* 6, 重置接收完毕判断时间                              */
- 142   2              sata.RX1_rev_timeout = 5;
- 143   2          }
- 144   1      }
- 145          
- 146          /**
- 147           * @brief       是否接收完毕判断函数
- 148           *
- 149           * @param   
+ 116   2              {
+ 117   3                  SBUF = sata.TX1_buf[sata.TX1_send_cnt++];
+ 118   3                  sata.TX1_send_bytelength--;
+ 119   3              }else
+ 120   2              {
+ 121   3                  sata.TX1_send_cnt = 0;
+ 122   3              }
+ 123   2          }
+ 124   1          
+ 125   1          /* 1, 检测到S2RI置1，即接收完毕                       */
+ 126   1          if( RI == 1 )
+ 127   1          {
+ 128   2              /* 2, 软件将S2RI清零，等待接收标志位重置，可继续发送    */
+ 129   2              RI = 0;
+ 130   2              /* 3, 判断数据包是否接收完毕                           */
+ 131   2              if( !sata.RX1_rev_end_Flag )
+ 132   2              {
+ 133   3                  /* 4, 数据包大于RX_buf 则从头计数                  */
+ 134   3                  if( sata.RX1_rev_cnt > 128 )
+ 135   3                  {
+ 136   4                      sata.RX1_rev_cnt = 0;
+ 137   4                  }
+ 138   3      
+ 139   3                  /* 5, 依次将RX4_buf中数据接收（读S2BUF操作即为接收）*/
+ 140   3                  sata.RX1_buf[sata.RX1_rev_cnt] = SBUF;
+ 141   3                  sata.RX1_rev_cnt++;
+ 142   3              }
+ 143   2              /* 6, 重置接收完毕判断时间                              */
+ 144   2              sata.RX1_rev_timeout = 5;
+ 145   2          }
+ 146   1      }
+ 147          
+ 148          /**
+ 149           * @brief       是否接收完毕判断函数
  150           *
- 151           * @return  void
- 152          **/
- 153          void Tim0_ISR( void ) interrupt 1   //1ms
- 154          {
- 155   1          /* 1, 如果接收未超时                                             */
- 156   1          if ( rs485.RX4_rev_timeout != 0 )  
- 157   1          {
- 158   2              rs485.RX4_rev_timeout--;
- 159   2              /* 2, 如果接收超时                                          */
- 160   2              if( rs485.RX4_rev_timeout == 0 )  
- 161   2              {
- 162   3                  if( rs485.RX4_rev_cnt > 0 )  
- 163   3                  {   
- 164   4                       /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
- 165   4                      rs485.RX4_rev_end_Flag = 1;    
- 166   4                  }
- 167   3              }
- 168   2          } 
- 169   1      
- 170   1          /* 1, 如果接收未超时                                             */
- 171   1          if ( sata.RX1_rev_timeout != 0 )  
- 172   1          {
- 173   2              sata.RX1_rev_timeout--;
- 174   2              /* 2, 如果接收超时                                          */
- 175   2              if( sata.RX1_rev_timeout == 0 )  
- 176   2              {
- 177   3                  if( sata.RX1_rev_cnt > 0 )  
-C51 COMPILER V9.60.7.0   COMMUNICATION                                                     05/18/2025 12:14:17 PAGE 4   
+ 151           * @param   
+ 152           *
+ 153           * @return  void
+ 154          **/
+ 155          void Tim0_ISR( void ) interrupt 1   //1ms
+ 156          {
+ 157   1          /* 1, 如果接收未超时                                             */
+ 158   1          if ( rs485.RX4_rev_timeout != 0 )  
+ 159   1          {
+ 160   2              rs485.RX4_rev_timeout--;
+ 161   2              /* 2, 如果接收超时                                          */
+ 162   2              if( rs485.RX4_rev_timeout == 0 )  
+ 163   2              {
+ 164   3                  if( rs485.RX4_rev_cnt > 0 )  
+ 165   3                  {   
+ 166   4                       /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
+ 167   4                      rs485.RX4_rev_end_Flag = 1;    
+ 168   4                  }
+ 169   3              }
+ 170   2          } 
+ 171   1      
+ 172   1          /* 1, 如果接收未超时                                             */
+ 173   1          if ( sata.RX1_rev_timeout != 0 )  
+ 174   1          {
+ 175   2              sata.RX1_rev_timeout--;
+ 176   2              /* 2, 如果接收超时                                          */
+ 177   2              if( sata.RX1_rev_timeout == 0 )  
+C51 COMPILER V9.60.7.0   COMMUNICATION                                                     05/19/2025 16:23:09 PAGE 4   
 
- 178   3                  {   
- 179   4                       /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
- 180   4                      sata.RX1_rev_end_Flag = 1;    
- 181   4                  }
- 182   3              }
- 183   2          } 
- 184   1      }
- 185          
- 186          
- 187          // /**
- 188          //  * @brief    串口1中断处理函数
- 189          //  *
- 190          //  * @param   
+ 178   2              {
+ 179   3                  if( sata.RX1_rev_cnt > 0 )  
+ 180   3                  {   
+ 181   4                       /* 3, 接收完毕标志位亮起并初始化接收缓冲区         */
+ 182   4                      sata.RX1_rev_end_Flag = 1;    
+ 183   4                  }
+ 184   3              }
+ 185   2          } 
+ 186   1      }
+ 187          
+ 188          
+ 189          // /**
+ 190          //  * @brief    串口1中断处理函数
  191          //  *
- 192          //  * @return  void
- 193          // **/
- 194          // void Uart1_ISR() interrupt 4
- 195          // {
- 196          //     if(TI == 1)
- 197          //     {
- 198          //         TI = 0;
- 199          //         TX1_busy_Flag = 0;
- 200          //     }
- 201          //     if(RI == 1)
- 202          //     {
- 203          //         RI = 0;
- 204          //     }
- 205          // }
- 206          
- 207          // /**
- 208          //  * @brief    串口重定向
- 209          //  *
- 210          //  * @param   c:字符串
+ 192          //  * @param   
+ 193          //  *
+ 194          //  * @return  void
+ 195          // **/
+ 196          // void Uart1_ISR() interrupt 4
+ 197          // {
+ 198          //     if(TI == 1)
+ 199          //     {
+ 200          //         TI = 0;
+ 201          //         TX1_busy_Flag = 0;
+ 202          //     }
+ 203          //     if(RI == 1)
+ 204          //     {
+ 205          //         RI = 0;
+ 206          //     }
+ 207          // }
+ 208          
+ 209          // /**
+ 210          //  * @brief    串口重定向
  211          //  *
- 212          //  * @return  c
- 213          // **/
- 214          // char putchar(char c)  // 串口重定向需要添加头文件stdio.h
- 215          // {
- 216          //     SBUF = c;
- 217          //     while(TX1_busy_Flag);
- 218          //     TX1_busy_Flag = 1;
- 219          //     return c;
- 220          // }
+ 212          //  * @param   c:字符串
+ 213          //  *
+ 214          //  * @return  c
+ 215          // **/
+ 216          // char putchar(char c)  // 串口重定向需要添加头文件stdio.h
+ 217          // {
+ 218          //     SBUF = c;
+ 219          //     while(TX1_busy_Flag);
+ 220          //     TX1_busy_Flag = 1;
+ 221          //     return c;
+ 222          // }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    403    ----
+   CODE SIZE        =    411    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =    525    ----
+   XDATA SIZE       =    527    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

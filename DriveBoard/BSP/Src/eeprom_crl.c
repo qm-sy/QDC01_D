@@ -106,5 +106,4 @@ void eeprom_data_init( void )
     qdc_info.stir_stop_time = ISP_Read(STIR_ADDR3);
 
     qdc_info.ink_out_time = ISP_Read(INK_OUT_ADDR);
-    send_to_EB_16();
 }

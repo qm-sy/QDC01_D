@@ -15,6 +15,6 @@
 #include "modbus_rtu.h"
 #include "pwm.h"
 #include "eeprom_crl.h"
-#include "dht11.h"
+
 
 #endif

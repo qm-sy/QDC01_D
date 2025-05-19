@@ -281,63 +281,25 @@ void Modbus_Fun3_Sata( void )
 **/
 void Modbus_Fun4_485( void )
 {
-    uint16_t i;
-
-    modbus.send_value_addr  = 3;                 //DATA1 H 位置
-    modbus.byte_cnt   = (rs485.RX4_buf[4]<<8 | rs485.RX4_buf[5]) *2;
-    modbus.start_addr = rs485.RX4_buf[2]<<8 | rs485.RX4_buf[3];
-
-    rs485.TX4_buf[0]  = ADDR_485;                //Addr
-    rs485.TX4_buf[1]  = 0x04;                   //Fun
-    rs485.TX4_buf[2]  = modbus.byte_cnt;        //Byte Count
-
-    for( i = modbus.start_addr; i < modbus.start_addr + modbus.byte_cnt/2; i++ )
-    {
-        /*    每次循环前初始化byte_info                       */
-        modbus.byte_info_H = modbus.byte_info_L = 0X00;
-        switch (i)
-        {
-            /*  30001  NTC1、NTC2温度查询                           */
-            case 0x00:
 
 
-                break;
-
-            /*  30002  NTC3、NTC4温度查询                */
-            case 0x01:
+    qdc_info.level_info2 = rs485.RX4_buf[3];
+    qdc_info.level_info1 = rs485.RX4_buf[4];
 
 
-                break;
+    /*  30002  NTC3、NTC4温度查询                */
 
-            /*  30003 环境温湿度查询                   */
-            case 0x02:
 
-                break;
+    /*  30003 温湿度                   */
 
-            /*  30004 Signal_IN状态查询                   */
-            case 0x03:
- 
+    qdc_info.dht11_hum = rs485.RX4_buf[7];
+    qdc_info.dht11_temp = rs485.RX4_buf[8];
 
-                break;
-                
-            /*  30005 运行时间（min）                   */
-            case 0x04:
 
-                break;
+    /*  30004 NTC1 温度                    */
 
-            /*  30006 运行时间（h）                   */
-            case 0x05:
-    
+    qdc_info.ntc1_temp = rs485.RX4_buf[10];
 
-                break;
-
-            default:
-                break;
-        }
-        rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_H;
-        rs485.TX4_buf[modbus.send_value_addr++] = modbus.byte_info_L;
-    }
-    slave_to_master_485(0x04,3 + modbus.byte_cnt);
 }
 
 
@@ -383,15 +345,15 @@ void Modbus_Fun4_Sata( void )
 
             /*  30003 环境温湿度查询                   */
             case 0x02:
-                modbus.byte_info_H = temp.dht11_humidity;
-                modbus.byte_info_L = temp.dht11_temp;
+                modbus.byte_info_H = qdc_info.dht11_hum;
+                modbus.byte_info_L = qdc_info.dht11_temp;
 
                 break;
 
             /*  30004 NTC温度                  */
             case 0x03:
                 modbus.byte_info_H = 0x00;
-                modbus.byte_info_L = temp.temp_value1;
+                modbus.byte_info_L = qdc_info.ntc1_temp;
 
                 break;
                 
@@ -467,6 +429,10 @@ void Modbus_Fun6_485( void )
 
             break;
             
+        case 0x07: 
+            qdc_info.ink_out_time = sata.RX1_buf[5];  
+            eeprom_data_record();
+
         default:
             break;   
     }
@@ -543,11 +509,8 @@ void Modbus_Fun6_Sata( void )
             break;
 
         /*  40008  缺墨延时时间                   */
-        case 0x07:                                         
-            qdc_info.ink_out_time = sata.RX1_buf[5];  
-
-            slave_to_master_Sata(0x06,8);
-            eeprom_data_record();
+        case 0x07:                             
+            send_to_EB_06(0x07,0x00,sata.RX1_buf[5]);                 
 
             break;
 
@@ -565,66 +528,7 @@ void Modbus_Fun6_Sata( void )
 **/
 void Modbus_Fun16_485( void )
 {
-    uint16_t i;
-
-    modbus.rcv_value_addr = 7;                  //DATA1 H位置
-    modbus.byte_cnt   = rs485.RX4_buf[6];
-    modbus.start_addr = rs485.RX4_buf[2]<<8 | rs485.RX4_buf[3];
-
-    
-    for( i = modbus.start_addr; i < modbus.start_addr + modbus.byte_cnt/2; i++)
-    {
-        modbus.byte_info_H = rs485.RX4_buf[modbus.rcv_value_addr];
-        modbus.byte_info_L = rs485.RX4_buf[modbus.rcv_value_addr + 1];
-        switch (i)
-        {
-            /*  40001  风速设置                 */
-            case 0x00:
-
-                break;
-            
-            /*  40002  LED 开关状态设置                          */
-            case 0x01:
-                led_ctrl(modbus.byte_info_L);
-
-                eeprom.led_info = modbus.byte_info_L;
-
-                break;
-
-            /*  40003 三路220V输出使能设置                          */
-            case 0x02:
-
-
-                break;
-
-            
-            /*  40004  同步状态设置                   */
-            case 0x03:
-
-
-                break;
-
-            /*  40005  工作模式设置                   */
-            case 0x04:                                         
-
-
-                break;
-
-            /*  40006  报警温度设置                   */
-            case 0x05:                                         
-
-                
-                break;
-                
-            default:
-                break;
-        }
-        modbus.rcv_value_addr += 2;         //从Value1_H →→ 从Value2_H
-    }
-
-    slave_to_master_485(0x10,8);
-
-    eeprom_data_record();                      //记录更改后的值
+    rs485.connect_flag = 1;
 }
 
 
@@ -885,41 +789,44 @@ void waste_ink_scan( void )
 
 void send_to_EB_16( void )
 {
-    uint8_t send_buf[17];
-   uint16_t crc;
+    uint8_t send_buf[19];
+    uint16_t crc;
 
-   send_buf[0] = 0xEB;
-   send_buf[1] = 0x10;
-   send_buf[2] = 0x00;
-   send_buf[3] = 0x00;
-   send_buf[4] = 0x00;
-   send_buf[5] = 0x04;
-   send_buf[6] = 0x08;
+    send_buf[0] = 0xEB;
+    send_buf[1] = 0x10;
+    send_buf[2] = 0x00;
+    send_buf[3] = 0x00;
+    send_buf[4] = 0x00;
+    send_buf[5] = 0x05;
+    send_buf[6] = 0x0a;
 
-   send_buf[7] = qdc_info.board_temp;
-   send_buf[8] = qdc_info.board_switch;
+    send_buf[7] = qdc_info.board_temp;
+    send_buf[8] = qdc_info.board_switch;
 
-   send_buf[9] = 0x00;
-   send_buf[10] = qdc_info.inksac_switch;
+    send_buf[9] = 0x00;
+    send_buf[10] = qdc_info.inksac_switch;
 
-   send_buf[11] = (qdc_info.cir_stop_time << 1) | (qdc_info.cir_start_time >> 5);
-   send_buf[12] = qdc_info.cir_switch | (qdc_info.cir_start_time << 3);
+    send_buf[11] = (qdc_info.cir_stop_time << 1) | (qdc_info.cir_start_time >> 5);
+    send_buf[12] = qdc_info.cir_switch | (qdc_info.cir_start_time << 3);
 
-   send_buf[13] = (qdc_info.stir_stop_time << 1) | (qdc_info.stir_start_time >> 5);
-   send_buf[14] = qdc_info.stir_switch | (qdc_info.stir_start_time << 3);
+    send_buf[13] = (qdc_info.stir_stop_time << 1) | (qdc_info.stir_start_time >> 5);
+    send_buf[14] = qdc_info.stir_switch | (qdc_info.stir_start_time << 3);
 
-   crc = MODBUS_CRC16(send_buf,15);
+    send_buf[15] = 0x00;
+    send_buf[16] = qdc_info.ink_out_time;
 
-   send_buf[15] = crc>>8;
-   send_buf[16] = crc;
+    crc = MODBUS_CRC16(send_buf,17);
 
-   memcpy(rs485.TX4_buf,send_buf,17);
-   
-   rs485.TX4_send_bytelength = 17;
-   DR_485 = 1;                                 //485可以发送
-   delay_ms(2);
-   S4CON |= S4TI;                              //开始发送
-   delay_ms(1);
+    send_buf[17] = crc>>8;
+    send_buf[18] = crc;
+
+    memcpy(rs485.TX4_buf,send_buf,19);
+    
+    rs485.TX4_send_bytelength = 19;
+    DR_485 = 1;                                 //485可以发送
+    delay_ms(2);
+    S4CON |= S4TI;                              //开始发送
+    delay_ms(1);
 }
 
 
@@ -949,3 +856,24 @@ void send_to_EB_06( uint8_t addr, uint8_t val_H, uint8_t val_L)
     delay_ms(1);
 }
 
+void send_to_EB_04( void )
+{
+    uint8_t send_buf[8];
+
+    send_buf[0] = 0xEB;
+    send_buf[1] = 0x04;
+    send_buf[2] = 0x00;
+    send_buf[3] = 0x00;
+    send_buf[4] = 0x00;
+    send_buf[5] = 0x04;
+    send_buf[6] = 0x03;
+    send_buf[7] = 0xE7;
+
+    memcpy(rs485.TX4_buf,send_buf,8);
+
+    rs485.TX4_send_bytelength = 8;
+    DR_485 = 1;                                 //485可以发送
+    delay_ms(2);
+    S4CON |= S4TI;                              //开始发送
+    delay_ms(1);
+}
