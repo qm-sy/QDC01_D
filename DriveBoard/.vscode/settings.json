@@ -1,5 +1,13 @@
 {
     "files.exclude": {
         "**/.vscode": true
+    },
+    "files.associations": {
+        "gpio.h": "c",
+        "ntc.h": "c",
+        "sys.h": "c",
+        "STDIO.H": "cpp",
+        "power_crl.h": "c",
+        "eeprom_crl.h": "c"
     }
 }

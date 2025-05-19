@@ -7,6 +7,7 @@
 #include "stdio.h"
 
 #define NTC        4
+#define THERMOPILE 0
 
 typedef struct 
 {

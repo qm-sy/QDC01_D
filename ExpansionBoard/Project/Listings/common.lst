@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 16:57:42 PAGE 1   
+C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 23:03:48 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMON
 OBJECT MODULE PLACED IN ..\Output\common.obj
-COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE ..\Emembed\Src\common.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP
-                    -\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\common.lst) OBJECT(..\Outpu
-                    -t\common.obj)
+COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\Emembed\Src\common.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\
+                    -BSP\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\common.lst) OBJECT(..\Ou
+                    -tput\common.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51   1          {
   52   2              level2_cnt++;
   53   2              if( level2_cnt >= level.level_delay )
-C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 16:57:42 PAGE 2   
+C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 23:03:48 PAGE 2   
 
   54   2              {
   55   3                  level2_cnt = 0;
@@ -126,7 +126,7 @@ line level    source
  113   2              {
  114   3                  level6_cnt = 0;
  115   3                  level.level6_down_flag = 1;
-C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 16:57:42 PAGE 3   
+C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 23:03:48 PAGE 3   
 
  116   3              }
  117   2          }else
@@ -170,12 +170,12 @@ line level    source
  154   1      
  155   1          if( stir_delay_cnt <= dc_ctrl.stir_start_time )
  156   1          {
- 157   2              pwm_ctrl(CIR_CTRL,dc_ctrl.stir_level);
+ 157   2              pwm_ctrl(STIR_CTRL,dc_ctrl.stir_level);
  158   2          }
  159   1          if((stir_delay_cnt < (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time)) && ( stir_delay_cnt > dc_ctrl
              -.stir_start_time ))
  160   1          {
- 161   2              pwm_ctrl(CIR_CTRL,0);
+ 161   2              pwm_ctrl(STIR_CTRL,0);
  162   2          }
  163   1          if(stir_delay_cnt >= (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time))
  164   1          {
@@ -190,7 +190,7 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    XDATA SIZE       =     20    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
-C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 16:57:42 PAGE 4   
+C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 23:03:48 PAGE 4   
 
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----

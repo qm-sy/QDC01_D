@@ -23,7 +23,7 @@ typedef struct
     uint8_t  ntc1_temp;
     uint8_t  thermopile_temp;                
 
-    uint8_t  roller_switch;
+    uint8_t  roller_enable;
     uint8_t  roller_temp;
     uint8_t  led_switch;            
     uint8_t  fan_level;                   
@@ -37,6 +37,16 @@ typedef struct
     uint8_t  stir_start_time;
     uint8_t  stir_stop_time;
     uint8_t  ink_out_time;
+
+    uint8_t  ink7_dis;
+
+    uint8_t  ink1;
+    uint8_t  ink2;
+    uint8_t  ink3;
+    uint8_t  ink4;
+    uint8_t  ink5;
+    uint8_t  ink6;
+    uint8_t  ink7;
 }QDC_INFO;
 
 

@@ -32,11 +32,17 @@ void fan_ctrl( uint8_t level )
     PWMB_CCR7= level * 184;
 }
 
-void rubber_roller_ctrl( uint8_t on_off )
+void rubber_roller_ctrl()
 {
-    if( on_off == 1)
+    if( qdc_info.roller_enable == 1 )
     {
-        AC_Out1 = 0;
+        if( qdc_info.thermopile_temp < qdc_info.roller_temp )  
+        {
+            AC_Out1 = 0; 
+        }else
+        {
+            AC_Out1 = 1;
+        }
     }else
     {
         AC_Out1 = 1;
@@ -55,16 +61,10 @@ void temp_scan( void )
     if( temp.temp_scan_flag == 1)
     {
 
-        // if( temp.temp_value1 >= temp.temp_alarm_value )  
-        // {
-        //     ac_dc.ac220_out_temp_allow = 0;     
-        // }else
-        // {
-        //     ac_dc.ac220_out_temp_allow = 1;     
-        // }
+        qdc_info.thermopile_temp = get_temp(THERMOPILE);
+        
+        rubber_roller_ctrl();
         
         temp.temp_scan_flag = 0;
     }
 }
-
-

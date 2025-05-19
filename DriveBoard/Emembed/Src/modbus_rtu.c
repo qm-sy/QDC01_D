@@ -105,9 +105,6 @@ void Modbus_Event_Sata( void )
 
                         break;  
 
-                    case 0x10:  
-                        Modbus_Fun16_Sata();
-
                     default:
                         break;
                 }
@@ -211,7 +208,7 @@ void Modbus_Fun3_Sata( void )
             /*  40001 胶辊加热                     */
             case 0x00:
                 modbus.byte_info_H = qdc_info.roller_temp;
-                modbus.byte_info_L = qdc_info.roller_switch;
+                modbus.byte_info_L = qdc_info.roller_enable;
 
                 break;
 
@@ -263,6 +260,13 @@ void Modbus_Fun3_Sata( void )
                 
                 break;
 
+            /*  40009  ink dis                      */
+            case 0x08:   
+                modbus.byte_info_H = 0x00;
+                modbus.byte_info_L = qdc_info.ink7_dis;
+                
+                break;
+
             default:
                 break;
         }
@@ -286,7 +290,28 @@ void Modbus_Fun4_485( void )
     qdc_info.level_info2 = rs485.RX4_buf[3];
     qdc_info.level_info1 = rs485.RX4_buf[4];
 
-
+    qdc_info.ink1 =  qdc_info.level_info1 & 0x03;
+    qdc_info.ink2 = (qdc_info.level_info1 & 0x0c) >> 2;
+    qdc_info.ink3 = (qdc_info.level_info1 & 0x30) >> 4;
+    qdc_info.ink4 = (qdc_info.level_info1 & 0xc0) >> 6;
+    qdc_info.ink5 = (qdc_info.level_info2 & 0x03);
+    qdc_info.ink6 = (qdc_info.level_info2 & 0x0c) >> 2;
+    if( qdc_info.ink7_dis == 1 )
+    {
+        qdc_info.ink7 = (qdc_info.level_info2 & 0x30) >> 4;
+    }else
+    {
+        qdc_info.ink7 = 0x03;
+    }
+    
+    if(( qdc_info.ink1 == 0x01 ) || ( qdc_info.ink2 == 0x01 ) || ( qdc_info.ink3 == 0x01 ) || ( qdc_info.ink4 == 0x01 ) \
+    ||( qdc_info.ink5 == 0x01 ) || ( qdc_info.ink6 == 0x01 ) || ( qdc_info.ink7 == 0x01 ) || ( qdc_info.waste_ink == 0x00))
+    {
+        Buzzer = 0;
+    }else
+    {
+        Buzzer = 1;
+    }
     /*  30002  NTC3、NTC4温度查询                */
 
 
@@ -360,7 +385,7 @@ void Modbus_Fun4_Sata( void )
             /*  30005 热电堆温度                   */
             case 0x04:
                 modbus.byte_info_H = 0x00;
-                modbus.byte_info_L = 25;
+                modbus.byte_info_L = qdc_info.thermopile_temp;
                 
                 break;
 
@@ -456,8 +481,7 @@ void Modbus_Fun6_Sata( void )
         /*  40001  胶辊加热                 */
         case 0x00:                  
             qdc_info.roller_temp = sata.RX1_buf[4];
-            qdc_info.roller_switch = sata.RX1_buf[5];
-            rubber_roller_ctrl(qdc_info.roller_switch);
+            qdc_info.roller_enable = sata.RX1_buf[5];
 
             slave_to_master_Sata(0x06,8);
             eeprom_data_record();
@@ -466,7 +490,7 @@ void Modbus_Fun6_Sata( void )
 
         /*  40002  LED 开关状态设置                          */
         case 0x01:        
-            qdc_info.fan_level = sata.RX1_buf[5];                                 
+            qdc_info.led_switch = sata.RX1_buf[5];                                 
             led_ctrl(sata.RX1_buf[5]);
 
             slave_to_master_Sata(0x06,8);
@@ -514,6 +538,14 @@ void Modbus_Fun6_Sata( void )
 
             break;
 
+        /*  40009  INK 显示                   */
+        case 0x08:                             
+            qdc_info.ink7_dis = sata.RX1_buf[5];       
+            slave_to_master_Sata(0x06,8);
+            eeprom_data_record();
+
+            break;
+
         default:
             break;   
     }
@@ -531,89 +563,6 @@ void Modbus_Fun16_485( void )
     rs485.connect_flag = 1;
 }
 
-
-/**
- * @brief	写多个输出寄存器  16
- *
- * @param   void
- *
- * @return  void 
-**/
-void Modbus_Fun16_Sata( void )
-{
-    uint16_t i;
-
-    modbus.rcv_value_addr = 7;                  //DATA1 H位置
-    modbus.byte_cnt   = sata.RX1_buf[6];
-    modbus.start_addr = sata.RX1_buf[2]<<8 |sata.RX1_buf[3];
-
-    
-    for( i = modbus.start_addr; i < modbus.start_addr + modbus.byte_cnt/2; i++)
-    {
-        modbus.byte_info_H = sata.RX1_buf[modbus.rcv_value_addr];
-        modbus.byte_info_L = sata.RX1_buf[modbus.rcv_value_addr + 1];
-        switch (i)
-        {
-            /*  40001  风速设置                 */
-            case 0x00:
-                qdc_info.roller_temp = sata.RX1_buf[4];
-                qdc_info.roller_switch = sata.RX1_buf[5];
-                rubber_roller_ctrl(qdc_info.roller_switch);
-
-                slave_to_master_Sata(0x06,8);
-                eeprom_data_record();
-
-                break;
-            
-            /*  40002  LED 开关状态设置                          */
-            case 0x01:
-                qdc_info.fan_level = sata.RX1_buf[5];                                 
-                led_ctrl(sata.RX1_buf[5]);
-
-                slave_to_master_Sata(0x06,8);
-                eeprom_data_record();     
-
-                break;
-
-            /*  40003 三路220V输出使能设置                          */
-            case 0x02:
-                qdc_info.fan_level = sata.RX1_buf[5];                                     
-                fan_ctrl(qdc_info.fan_level);
-
-                slave_to_master_Sata(0x06,8);
-                eeprom_data_record();
-
-                break;
-
-            
-            /*  40004  同步状态设置                   */
-            case 0x03:
-
-
-                break;
-
-            /*  40005  工作模式设置                   */
-            case 0x04:                                         
-
-
-                break;
-
-            /*  40006  报警温度设置                   */
-            case 0x05:                                         
-
-                
-                break;
-                
-            default:
-                break;
-        }
-        modbus.rcv_value_addr += 2;         //从Value1_H →→ 从Value2_H
-    }
-
-    slave_to_master_Sata(0x10,8);
-
-    //eeprom_data_record();                      //记录更改后的值
-}
 
 /**
  * @brief	从机回复主机

@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/19/2025 16:23:09 PAGE 1   
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/20/2025 00:31:35 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE EEPROM_CRL
 OBJECT MODULE PLACED IN ..\Output\eeprom_crl.obj
-COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE ..\BSP\Src\eeprom_crl.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP
-                    -\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\eeprom_crl.lst) OBJECT(..\O
-                    -utput\eeprom_crl.obj)
+COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\BSP\Src\eeprom_crl.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\
+                    -BSP\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\eeprom_crl.lst) OBJECT(.
+                    -.\Output\eeprom_crl.obj)
 
 line level    source
 
@@ -28,7 +28,7 @@ line level    source
   17   1      
   18   1          if( eeprom_statu_flag == 0xFF)
   19   1          {
-  20   2              qdc_info.roller_switch   = 1;
+  20   2              qdc_info.roller_enable   = 1;
   21   2              qdc_info.roller_temp     = 60;
   22   2              qdc_info.led_switch      = 1;
   23   2              qdc_info.fan_level       = 3;
@@ -46,88 +46,94 @@ line level    source
   35   2      
   36   2              qdc_info.ink_out_time    = 50;
   37   2      
-  38   2              eeprom_data_record(); 
-  39   2          }
-  40   1          eeprom_data_init();    
-  41   1      }
-  42          
-  43          /**
-  44           * @brief       eeprom 数据写入
-  45           *
-  46           * @param   
+  38   2              qdc_info.ink7_dis         = 1;
+  39   2      
+  40   2              eeprom_data_record(); 
+  41   2          }
+  42   1          eeprom_data_init();    
+  43   1      }
+  44          
+  45          /**
+  46           * @brief       eeprom 数据写入
   47           *
-  48           * @return  void
-  49          **/
-  50          void eeprom_data_record( void )
-  51          {
-  52   1          ISP_Earse(0x0000);
-  53   1      
-C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/19/2025 16:23:09 PAGE 2   
+  48           * @param   
+  49           *
+  50           * @return  void
+  51          **/
+  52          void eeprom_data_record( void )
+  53          {
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/20/2025 00:31:35 PAGE 2   
 
-  54   1          ISP_Write(ROLLER_ADDR1,qdc_info.roller_switch);
-  55   1          ISP_Write(ROLLER_ADDR2,qdc_info.roller_temp);
-  56   1          ISP_Write(LED_ADDR,qdc_info.led_switch);
-  57   1          ISP_Write(FAN_ADDR,qdc_info.fan_level);
-  58   1          ISP_Write(BOARD_ADDR1,qdc_info.board_switch);
-  59   1          ISP_Write(BOARD_ADDR2,qdc_info.board_temp);
-  60   1          ISP_Write(INKSAC_ADDR,qdc_info.inksac_switch);
-  61   1      
-  62   1          ISP_Write(CIR_ADDR1,qdc_info.cir_switch);
-  63   1          ISP_Write(CIR_ADDR2,qdc_info.cir_start_time);
-  64   1          ISP_Write(CIR_ADDR3,qdc_info.cir_stop_time);
-  65   1      
-  66   1          ISP_Write(STIR_ADDR1,qdc_info.stir_switch);
-  67   1          ISP_Write(STIR_ADDR2,qdc_info.stir_start_time);
-  68   1          ISP_Write(STIR_ADDR3,qdc_info.stir_stop_time);
-  69   1          
-  70   1          ISP_Write(INK_OUT_ADDR,qdc_info.ink_out_time);
-  71   1      
-  72   1          ISP_Write(EEPROM_STATU_JUDGE,0x58);
-  73   1      }
-  74          
-  75          /**
-  76           * @brief       eeprom 数据初始化
-  77           *
-  78           * @param   
-  79           *
-  80           * @return  void
-  81          **/
-  82          void eeprom_data_init( void )
-  83          {
-  84   1          qdc_info.roller_switch = ISP_Read(ROLLER_ADDR1);
-  85   1          qdc_info.roller_temp = ISP_Read(ROLLER_ADDR2);
-  86   1      
-  87   1          rubber_roller_ctrl(qdc_info.roller_switch);
-  88   1      
-  89   1          qdc_info.led_switch = ISP_Read(LED_ADDR);
-  90   1          led_ctrl(qdc_info.led_switch);
-  91   1      
-  92   1          qdc_info.fan_level = ISP_Read(FAN_ADDR);
-  93   1          fan_ctrl(qdc_info.fan_level);
-  94   1      
-  95   1          qdc_info.board_switch = ISP_Read(BOARD_ADDR1);
-  96   1          qdc_info.board_temp   = ISP_Read(BOARD_ADDR2);
-  97   1      
-  98   1          qdc_info.inksac_switch = ISP_Read(INKSAC_ADDR);
-  99   1      
- 100   1          qdc_info.cir_switch = ISP_Read(CIR_ADDR1);
- 101   1          qdc_info.cir_start_time = ISP_Read(CIR_ADDR2);
- 102   1          qdc_info.cir_stop_time = ISP_Read(CIR_ADDR3);
+  54   1          ISP_Earse(0x0000);
+  55   1      
+  56   1          ISP_Write(ROLLER_ADDR1,qdc_info.roller_enable);
+  57   1          ISP_Write(ROLLER_ADDR2,qdc_info.roller_temp);
+  58   1          ISP_Write(LED_ADDR,qdc_info.led_switch);
+  59   1          ISP_Write(FAN_ADDR,qdc_info.fan_level);
+  60   1          ISP_Write(BOARD_ADDR1,qdc_info.board_switch);
+  61   1          ISP_Write(BOARD_ADDR2,qdc_info.board_temp);
+  62   1          ISP_Write(INKSAC_ADDR,qdc_info.inksac_switch);
+  63   1      
+  64   1          ISP_Write(CIR_ADDR1,qdc_info.cir_switch);
+  65   1          ISP_Write(CIR_ADDR2,qdc_info.cir_start_time);
+  66   1          ISP_Write(CIR_ADDR3,qdc_info.cir_stop_time);
+  67   1      
+  68   1          ISP_Write(STIR_ADDR1,qdc_info.stir_switch);
+  69   1          ISP_Write(STIR_ADDR2,qdc_info.stir_start_time);
+  70   1          ISP_Write(STIR_ADDR3,qdc_info.stir_stop_time);
+  71   1          
+  72   1          ISP_Write(INK_OUT_ADDR,qdc_info.ink_out_time);
+  73   1      
+  74   1          ISP_Write(INK_DIS,qdc_info.ink7_dis);
+  75   1      
+  76   1          ISP_Write(EEPROM_STATU_JUDGE,0x58);
+  77   1      }
+  78          
+  79          /**
+  80           * @brief       eeprom 数据初始化
+  81           *
+  82           * @param   
+  83           *
+  84           * @return  void
+  85          **/
+  86          void eeprom_data_init( void )
+  87          {
+  88   1          qdc_info.roller_enable = ISP_Read(ROLLER_ADDR1);
+  89   1          qdc_info.roller_temp = ISP_Read(ROLLER_ADDR2);
+  90   1      
+  91   1          rubber_roller_ctrl();
+  92   1      
+  93   1          qdc_info.led_switch = ISP_Read(LED_ADDR);
+  94   1          led_ctrl(qdc_info.led_switch);
+  95   1      
+  96   1          qdc_info.fan_level = ISP_Read(FAN_ADDR);
+  97   1          fan_ctrl(qdc_info.fan_level);
+  98   1      
+  99   1          qdc_info.board_switch = ISP_Read(BOARD_ADDR1);
+ 100   1          qdc_info.board_temp   = ISP_Read(BOARD_ADDR2);
+ 101   1      
+ 102   1          qdc_info.inksac_switch = ISP_Read(INKSAC_ADDR);
  103   1      
- 104   1          qdc_info.stir_switch = ISP_Read(STIR_ADDR1);
- 105   1          qdc_info.stir_start_time = ISP_Read(STIR_ADDR2);
- 106   1          qdc_info.stir_stop_time = ISP_Read(STIR_ADDR3);
+ 104   1          qdc_info.cir_switch = ISP_Read(CIR_ADDR1);
+ 105   1          qdc_info.cir_start_time = ISP_Read(CIR_ADDR2);
+ 106   1          qdc_info.cir_stop_time = ISP_Read(CIR_ADDR3);
  107   1      
- 108   1          qdc_info.ink_out_time = ISP_Read(INK_OUT_ADDR);
- 109   1      }
+ 108   1          qdc_info.stir_switch = ISP_Read(STIR_ADDR1);
+ 109   1          qdc_info.stir_start_time = ISP_Read(STIR_ADDR2);
+ 110   1          qdc_info.stir_stop_time = ISP_Read(STIR_ADDR3);
+ 111   1      
+ 112   1          qdc_info.ink_out_time = ISP_Read(INK_OUT_ADDR);
+ 113   1      
+ 114   1          qdc_info.ink7_dis = ISP_Read(INK_DIS);
+ 115   1      }
+C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/20/2025 00:31:35 PAGE 3   
+
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    436    ----
+   CODE SIZE        =    459    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =     10    ----
-C51 COMPILER V9.60.7.0   EEPROM_CRL                                                        05/19/2025 16:23:09 PAGE 3   
-
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

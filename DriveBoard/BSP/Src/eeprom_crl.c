@@ -17,7 +17,7 @@ void eeprom_statu_judge( void )
 
     if( eeprom_statu_flag == 0xFF)
     {
-        qdc_info.roller_switch   = 1;
+        qdc_info.roller_enable   = 1;
         qdc_info.roller_temp     = 60;
         qdc_info.led_switch      = 1;
         qdc_info.fan_level       = 3;
@@ -35,6 +35,8 @@ void eeprom_statu_judge( void )
 
         qdc_info.ink_out_time    = 50;
 
+        qdc_info.ink7_dis         = 1;
+
         eeprom_data_record(); 
     }
     eeprom_data_init();    
@@ -51,7 +53,7 @@ void eeprom_data_record( void )
 {
     ISP_Earse(0x0000);
 
-    ISP_Write(ROLLER_ADDR1,qdc_info.roller_switch);
+    ISP_Write(ROLLER_ADDR1,qdc_info.roller_enable);
     ISP_Write(ROLLER_ADDR2,qdc_info.roller_temp);
     ISP_Write(LED_ADDR,qdc_info.led_switch);
     ISP_Write(FAN_ADDR,qdc_info.fan_level);
@@ -69,6 +71,8 @@ void eeprom_data_record( void )
     
     ISP_Write(INK_OUT_ADDR,qdc_info.ink_out_time);
 
+    ISP_Write(INK_DIS,qdc_info.ink7_dis);
+
     ISP_Write(EEPROM_STATU_JUDGE,0x58);
 }
 
@@ -81,10 +85,10 @@ void eeprom_data_record( void )
 **/
 void eeprom_data_init( void )
 {
-    qdc_info.roller_switch = ISP_Read(ROLLER_ADDR1);
+    qdc_info.roller_enable = ISP_Read(ROLLER_ADDR1);
     qdc_info.roller_temp = ISP_Read(ROLLER_ADDR2);
 
-    rubber_roller_ctrl(qdc_info.roller_switch);
+    rubber_roller_ctrl();
 
     qdc_info.led_switch = ISP_Read(LED_ADDR);
     led_ctrl(qdc_info.led_switch);
@@ -106,4 +110,6 @@ void eeprom_data_init( void )
     qdc_info.stir_stop_time = ISP_Read(STIR_ADDR3);
 
     qdc_info.ink_out_time = ISP_Read(INK_OUT_ADDR);
+
+    qdc_info.ink7_dis = ISP_Read(INK_DIS);
 }

@@ -22,6 +22,7 @@
 #define STIR_ADDR2          0X000B
 #define STIR_ADDR3          0X000C
 #define INK_OUT_ADDR        0X000D
+#define INK_DIS             0X000E
 
 #define EEPROM_STATU_JUDGE    0X000F         
 

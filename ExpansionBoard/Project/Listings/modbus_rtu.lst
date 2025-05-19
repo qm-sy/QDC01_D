@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 16:57:42 PAGE 1   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 23:03:48 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MODBUS_RTU
 OBJECT MODULE PLACED IN ..\Output\modbus_rtu.obj
-COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE ..\Emembed\Src\modbus_rtu.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..
-                    -\BSP\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\modbus_rtu.lst) OBJECT(
-                    -..\Output\modbus_rtu.obj)
+COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\Emembed\Src\modbus_rtu.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR
+                    -(..\BSP\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\modbus_rtu.lst) OBJE
+                    -CT(..\Output\modbus_rtu.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51   5                              Modbus_Fun16();
   52   5      
   53   5                          default:
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 16:57:42 PAGE 2   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 23:03:48 PAGE 2   
 
   54   5                              break;
   55   5                      }
@@ -126,7 +126,7 @@ line level    source
  113   3      
  114   3                  /*  40006 报警温度查询                     */
  115   3                  case 5:   
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 16:57:42 PAGE 3   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 23:03:48 PAGE 3   
 
  116   3              
  117   3      
@@ -190,7 +190,7 @@ line level    source
  175   3                  case 0x03:
  176   3                      modbus.byte_info_H = 0x00;
  177   3                      modbus.byte_info_L = temp.temp_value1;
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 16:57:42 PAGE 4   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 23:03:48 PAGE 4   
 
  178   3                      break;
  179   3      
@@ -254,7 +254,7 @@ line level    source
  236   2      
  237   2                  break;
  238   2      
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 16:57:42 PAGE 5   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 23:03:48 PAGE 5   
 
  239   2              /*  40007  搅拌控制                   */
  240   2              case 0x06:  
@@ -318,7 +318,7 @@ line level    source
  297   3                  case 0x02:                                         
  298   3                      dc_ctrl.cir_start_time = ((modbus.byte_info_L >> 3) | ((modbus.byte_info_H & 0x01) << 5)) 
              -* 100;     
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 16:57:42 PAGE 6   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 23:03:48 PAGE 6   
 
  299   3                      dc_ctrl.cir_stop_time  = (modbus.byte_info_H >> 1) * 100;    
  300   3                      dc_ctrl.cir_level = modbus.byte_info_L & 0x07;            
@@ -382,7 +382,7 @@ line level    source
  357   2                  rs485.TX4_buf[length] = crc>>8;            //CRC L
  358   2      
  359   2                  rs485.TX4_send_bytelength = length + 2;
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 16:57:42 PAGE 7   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 23:03:48 PAGE 7   
 
  360   2                  
  361   2                  break;    
@@ -446,7 +446,7 @@ line level    source
  417   3                  {
  418   4                      crc16 = (crc16 >> 1) ^ 0xA001;
  419   4                  }
-C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 16:57:42 PAGE 8   
+C51 COMPILER V9.60.7.0   MODBUS_RTU                                                        05/19/2025 23:03:48 PAGE 8   
 
  420   3                  /* 4, 如果最低位为0，把CRC寄存器的内容右移一位(朝低位)，用0填补最高
              -位                */

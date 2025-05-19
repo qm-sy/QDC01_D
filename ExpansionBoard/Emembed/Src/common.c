@@ -154,11 +154,11 @@ void Tim3_ISR( void ) interrupt 19
 
     if( stir_delay_cnt <= dc_ctrl.stir_start_time )
     {
-        pwm_ctrl(CIR_CTRL,dc_ctrl.stir_level);
+        pwm_ctrl(STIR_CTRL,dc_ctrl.stir_level);
     }
     if((stir_delay_cnt < (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time)) && ( stir_delay_cnt > dc_ctrl.stir_start_time ))
     {
-        pwm_ctrl(CIR_CTRL,0);
+        pwm_ctrl(STIR_CTRL,0);
     }
     if(stir_delay_cnt >= (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time))
     {
