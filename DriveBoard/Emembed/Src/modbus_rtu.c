@@ -242,14 +242,14 @@ void Modbus_Fun3_Sata( void )
 
             /*  40006 循环控制                     */
             case 0x05:   
-                modbus.byte_info_H = (qdc_info.cir_stop_time << 1) | (qdc_info.cir_start_time >> 5);
-                modbus.byte_info_L = qdc_info.cir_switch | (qdc_info.cir_start_time << 3);
+                modbus.byte_info_H = (qdc_info.cir_stop_time << 1) | (qdc_info.cir_start_time >> 5) | (qdc_info.cir_switch << 7);
+                modbus.byte_info_L = qdc_info.cir_level | (qdc_info.cir_start_time << 3);
                 
                 break;
             /*  40007 搅拌控制                     */
             case 0x06:   
-                modbus.byte_info_H = (qdc_info.stir_stop_time << 1) | (qdc_info.stir_start_time >> 5);
-                modbus.byte_info_L = qdc_info.stir_switch | (qdc_info.stir_start_time << 3);
+                modbus.byte_info_H = (qdc_info.stir_stop_time << 1) | (qdc_info.stir_start_time >> 5) | (qdc_info.stir_switch << 7);
+                modbus.byte_info_L = qdc_info.stir_level | (qdc_info.stir_start_time << 3);
 
                 break;
 
@@ -440,16 +440,19 @@ void Modbus_Fun6_485( void )
 
         /*  40006  报警温度设置                   */
         case 0x05:                                         
-            qdc_info.cir_switch = (sata.RX1_buf[5] & 0x07);     
+            qdc_info.cir_level = (sata.RX1_buf[5] & 0x07);     
             qdc_info.cir_start_time = (sata.RX1_buf[5] >> 3) | ((sata.RX1_buf[4] & 0x01) << 5);
-            qdc_info.cir_stop_time = sata.RX1_buf[4] >> 1;
-            
+            qdc_info.cir_stop_time = (sata.RX1_buf[4] & 0x7F) >> 1;
+            qdc_info.cir_switch = sata.RX1_buf[4] >> 7;
+
             break;
 
         case 0x06:  
-            qdc_info.stir_switch = (sata.RX1_buf[5] & 0x07);     
+            qdc_info.stir_level = (sata.RX1_buf[5] & 0x07);     
             qdc_info.stir_start_time = (sata.RX1_buf[5] >> 3) | ((sata.RX1_buf[4] & 0x01) << 5);
-            qdc_info.stir_stop_time = sata.RX1_buf[4] >> 1;
+            qdc_info.stir_stop_time = (sata.RX1_buf[4] & 0x7F)>> 1;
+            qdc_info.stir_switch = sata.RX1_buf[4] >> 7;
+
             eeprom_data_record();
 
             break;
@@ -755,11 +758,11 @@ void send_to_EB_16( void )
     send_buf[9] = 0x00;
     send_buf[10] = qdc_info.inksac_switch;
 
-    send_buf[11] = (qdc_info.cir_stop_time << 1) | (qdc_info.cir_start_time >> 5);
-    send_buf[12] = qdc_info.cir_switch | (qdc_info.cir_start_time << 3);
+    send_buf[11] = (qdc_info.cir_stop_time << 1) | (qdc_info.cir_start_time >> 5) | (qdc_info.cir_switch << 7);
+    send_buf[12] = qdc_info.cir_level | (qdc_info.cir_start_time << 3);
 
-    send_buf[13] = (qdc_info.stir_stop_time << 1) | (qdc_info.stir_start_time >> 5);
-    send_buf[14] = qdc_info.stir_switch | (qdc_info.stir_start_time << 3);
+    send_buf[13] = (qdc_info.stir_stop_time << 1) | (qdc_info.stir_start_time >> 5) | (qdc_info.stir_switch << 7);
+    send_buf[14] = qdc_info.stir_level | (qdc_info.stir_start_time << 3);
 
     send_buf[15] = 0x00;
     send_buf[16] = qdc_info.ink_out_time;

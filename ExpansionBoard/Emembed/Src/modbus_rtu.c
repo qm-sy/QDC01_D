@@ -230,19 +230,33 @@ void Modbus_Fun6( void )
         /*  40006  循环控制                  */
         case 0x05:                  
             dc_ctrl.cir_start_time = ((rs485.RX4_buf[5] >> 3) | ((rs485.RX4_buf[4] & 0x01) << 5)) * 100;     
-            dc_ctrl.cir_stop_time  = (rs485.RX4_buf[4] >> 1) * 100;  
-            dc_ctrl.cir_level = rs485.RX4_buf[5]&0x07;           
-            pwm_ctrl(CIR_CTRL,dc_ctrl.cir_level);
-
+            dc_ctrl.cir_stop_time  = ((rs485.RX4_buf[4] & 0x7F) >> 1) * 100;  
+            dc_ctrl.cir_level = rs485.RX4_buf[5]&0x07;   
+            dc_ctrl.cir_switch = rs485.RX4_buf[4] >> 7;
+            if(dc_ctrl.cir_switch == 1)
+            {
+                pwm_ctrl(CIR_CTRL,dc_ctrl.cir_level);
+            }else
+            {
+                pwm_ctrl(CIR_CTRL,0);
+            }
+            
             break;
 
         /*  40007  搅拌控制                   */
         case 0x06:  
             dc_ctrl.stir_start_time = ((rs485.RX4_buf[5] >> 3) | ((rs485.RX4_buf[4] & 0x01) << 5)) * 100;     
-            dc_ctrl.stir_stop_time  = (rs485.RX4_buf[4] >> 1) * 100;   
+            dc_ctrl.stir_stop_time  = ((rs485.RX4_buf[4] & 0x7F) >> 1) * 100;   
             dc_ctrl.stir_level = rs485.RX4_buf[5]&0x07;  
-            pwm_ctrl(STIR_CTRL,dc_ctrl.stir_level);
-
+            dc_ctrl.stir_switch = rs485.RX4_buf[4] >> 7;
+            if(dc_ctrl.stir_switch == 1)
+            {
+                pwm_ctrl(STIR_CTRL,dc_ctrl.stir_level);
+            }else
+            {
+                pwm_ctrl(STIR_CTRL,0);
+            }
+  
             break;
 
         /*  40007  缺墨延时时间                   */
@@ -296,17 +310,32 @@ void Modbus_Fun16( void )
             /*  40003    循环控制                         */
             case 0x02:                                         
                 dc_ctrl.cir_start_time = ((modbus.byte_info_L >> 3) | ((modbus.byte_info_H & 0x01) << 5)) * 100;     
-                dc_ctrl.cir_stop_time  = (modbus.byte_info_H >> 1) * 100;    
-                dc_ctrl.cir_level = modbus.byte_info_L & 0x07;            
-                pwm_ctrl(CIR_CTRL,dc_ctrl.cir_level);
+                dc_ctrl.cir_stop_time  = ((modbus.byte_info_H & 0x7F) >> 1) * 100;  
+                dc_ctrl.cir_level = modbus.byte_info_L&0x07;   
+                dc_ctrl.cir_switch = modbus.byte_info_H >> 7;
+                if(dc_ctrl.cir_switch == 1)
+                {
+                    pwm_ctrl(CIR_CTRL,dc_ctrl.cir_level);
+                }else
+                {
+                    pwm_ctrl(CIR_CTRL,0);
+                }
+
                 break;  
                 
             /*  40004  搅拌控制                   */
             case 0x03:   
-                dc_ctrl.stir_start_time = ((modbus.byte_info_L >> 3) | ((modbus.byte_info_H & 0x01) << 5)) * 100;  
-                dc_ctrl.stir_stop_time  = (modbus.byte_info_H >> 1) * 100;   
-                dc_ctrl.stir_level = modbus.byte_info_L & 0x07;
-                pwm_ctrl(STIR_CTRL,dc_ctrl.stir_level);
+                dc_ctrl.stir_start_time = ((modbus.byte_info_L >> 3) | ((modbus.byte_info_H & 0x01) << 5)) * 100;     
+                dc_ctrl.stir_stop_time  = ((modbus.byte_info_H & 0x7F) >> 1) * 100;  
+                dc_ctrl.stir_level = modbus.byte_info_L&0x07;   
+                dc_ctrl.stir_switch = modbus.byte_info_H >> 7;
+                if(dc_ctrl.stir_switch == 1)
+                {
+                    pwm_ctrl(STIR_CTRL,dc_ctrl.stir_level);
+                }else
+                {
+                    pwm_ctrl(STIR_CTRL,0);
+                }
 
                 break;
 

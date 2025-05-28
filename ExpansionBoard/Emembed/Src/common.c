@@ -137,31 +137,37 @@ void Tim3_ISR( void ) interrupt 19
     }
 
     /* 3. 循环和搅拌电机延时 */
-    cir_delay_cnt++;
-    stir_delay_cnt++;
-    if( cir_delay_cnt <= dc_ctrl.cir_start_time )
+    if( dc_ctrl.cir_switch == 1 )
     {
-        pwm_ctrl(CIR_CTRL,dc_ctrl.cir_level);
+        cir_delay_cnt++;
+        if( cir_delay_cnt <= dc_ctrl.cir_start_time )
+        {
+            pwm_ctrl(CIR_CTRL,dc_ctrl.cir_level);
+        }
+        if((cir_delay_cnt < (dc_ctrl.cir_start_time + dc_ctrl.cir_stop_time)) && ( cir_delay_cnt > dc_ctrl.cir_start_time ))
+        {
+            pwm_ctrl(CIR_CTRL,0);
+        }
+        if(cir_delay_cnt >= (dc_ctrl.cir_start_time + dc_ctrl.cir_stop_time))
+        {
+            cir_delay_cnt = 0;
+        }
     }
-    if((cir_delay_cnt < (dc_ctrl.cir_start_time + dc_ctrl.cir_stop_time)) && ( cir_delay_cnt > dc_ctrl.cir_start_time ))
+    
+    if( dc_ctrl.stir_switch == 1 )
     {
-        pwm_ctrl(CIR_CTRL,0);
-    }
-    if(cir_delay_cnt >= (dc_ctrl.cir_start_time + dc_ctrl.cir_stop_time))
-    {
-        cir_delay_cnt = 0;
-    }
-
-    if( stir_delay_cnt <= dc_ctrl.stir_start_time )
-    {
-        pwm_ctrl(STIR_CTRL,dc_ctrl.stir_level);
-    }
-    if((stir_delay_cnt < (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time)) && ( stir_delay_cnt > dc_ctrl.stir_start_time ))
-    {
-        pwm_ctrl(STIR_CTRL,0);
-    }
-    if(stir_delay_cnt >= (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time))
-    {
-        stir_delay_cnt = 0;
-    }
+        stir_delay_cnt++;
+        if( stir_delay_cnt <= dc_ctrl.stir_start_time )
+        {
+            pwm_ctrl(STIR_CTRL,dc_ctrl.stir_level);
+        }
+        if((stir_delay_cnt < (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time)) && ( stir_delay_cnt > dc_ctrl.stir_start_time ))
+        {
+            pwm_ctrl(STIR_CTRL,0);
+        }
+        if(stir_delay_cnt >= (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time))
+        {
+            stir_delay_cnt = 0;
+        }
+    }  
 }

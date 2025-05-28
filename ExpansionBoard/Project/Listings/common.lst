@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 23:03:48 PAGE 1   
+C51 COMPILER V9.60.7.0   COMMON                                                            05/20/2025 09:56:11 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE COMMON
 OBJECT MODULE PLACED IN ..\Output\common.obj
-COMPILER INVOKED BY: D:\APP\Keil_STM32\C51\BIN\C51.EXE ..\Emembed\Src\common.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\
-                    -BSP\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\common.lst) OBJECT(..\Ou
-                    -tput\common.obj)
+COMPILER INVOKED BY: D:\APP\Keil_v5\C51\BIN\C51.EXE ..\Emembed\Src\common.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(..\BSP
+                    -\Inc;..\Core\Inc;..\Driver;..\Emembed\Inc;..\SYSTEM\Inc) DEBUG OBJECTEXTEND PRINT(.\Listings\common.lst) OBJECT(..\Outpu
+                    -t\common.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51   1          {
   52   2              level2_cnt++;
   53   2              if( level2_cnt >= level.level_delay )
-C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 23:03:48 PAGE 2   
+C51 COMPILER V9.60.7.0   COMMON                                                            05/20/2025 09:56:11 PAGE 2   
 
   54   2              {
   55   3                  level2_cnt = 0;
@@ -126,7 +126,7 @@ line level    source
  113   2              {
  114   3                  level6_cnt = 0;
  115   3                  level.level6_down_flag = 1;
-C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 23:03:48 PAGE 3   
+C51 COMPILER V9.60.7.0   COMMON                                                            05/20/2025 09:56:11 PAGE 3   
 
  116   3              }
  117   2          }else
@@ -152,46 +152,52 @@ line level    source
  137   2          }
  138   1      
  139   1          /* 3. 循环和搅拌电机延时 */
- 140   1          cir_delay_cnt++;
- 141   1          stir_delay_cnt++;
- 142   1          if( cir_delay_cnt <= dc_ctrl.cir_start_time )
- 143   1          {
- 144   2              pwm_ctrl(CIR_CTRL,dc_ctrl.cir_level);
- 145   2          }
- 146   1          if((cir_delay_cnt < (dc_ctrl.cir_start_time + dc_ctrl.cir_stop_time)) && ( cir_delay_cnt > dc_ctrl.cir
-             -_start_time ))
- 147   1          {
- 148   2              pwm_ctrl(CIR_CTRL,0);
- 149   2          }
- 150   1          if(cir_delay_cnt >= (dc_ctrl.cir_start_time + dc_ctrl.cir_stop_time))
- 151   1          {
- 152   2              cir_delay_cnt = 0;
- 153   2          }
- 154   1      
- 155   1          if( stir_delay_cnt <= dc_ctrl.stir_start_time )
- 156   1          {
- 157   2              pwm_ctrl(STIR_CTRL,dc_ctrl.stir_level);
- 158   2          }
- 159   1          if((stir_delay_cnt < (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time)) && ( stir_delay_cnt > dc_ctrl
-             -.stir_start_time ))
- 160   1          {
- 161   2              pwm_ctrl(STIR_CTRL,0);
- 162   2          }
- 163   1          if(stir_delay_cnt >= (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time))
- 164   1          {
- 165   2              stir_delay_cnt = 0;
- 166   2          }
- 167   1      }
+ 140   1          if( dc_ctrl.cir_switch == 1 )
+ 141   1          {
+ 142   2              cir_delay_cnt++;
+ 143   2              if( cir_delay_cnt <= dc_ctrl.cir_start_time )
+ 144   2              {
+ 145   3                  pwm_ctrl(CIR_CTRL,dc_ctrl.cir_level);
+ 146   3              }
+ 147   2              if((cir_delay_cnt < (dc_ctrl.cir_start_time + dc_ctrl.cir_stop_time)) && ( cir_delay_cnt > dc_ctrl
+             -.cir_start_time ))
+ 148   2              {
+ 149   3                  pwm_ctrl(CIR_CTRL,0);
+ 150   3              }
+ 151   2              if(cir_delay_cnt >= (dc_ctrl.cir_start_time + dc_ctrl.cir_stop_time))
+ 152   2              {
+ 153   3                  cir_delay_cnt = 0;
+ 154   3              }
+ 155   2          }
+ 156   1          
+ 157   1          if( dc_ctrl.stir_switch == 1 )
+ 158   1          {
+ 159   2              stir_delay_cnt++;
+ 160   2              if( stir_delay_cnt <= dc_ctrl.stir_start_time )
+ 161   2              {
+ 162   3                  pwm_ctrl(STIR_CTRL,dc_ctrl.stir_level);
+ 163   3              }
+ 164   2              if((stir_delay_cnt < (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time)) && ( stir_delay_cnt > dc_
+             -ctrl.stir_start_time ))
+ 165   2              {
+ 166   3                  pwm_ctrl(STIR_CTRL,0);
+ 167   3              }
+ 168   2              if(stir_delay_cnt >= (dc_ctrl.stir_start_time + dc_ctrl.stir_stop_time))
+ 169   2              {
+ 170   3                  stir_delay_cnt = 0;
+ 171   3              }
+ 172   2          }  
+ 173   1      }
 
+
+C51 COMPILER V9.60.7.0   COMMON                                                            05/20/2025 09:56:11 PAGE 4   
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    780    ----
+   CODE SIZE        =    802    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =     20    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
-C51 COMPILER V9.60.7.0   COMMON                                                            05/19/2025 23:03:48 PAGE 4   
-
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.

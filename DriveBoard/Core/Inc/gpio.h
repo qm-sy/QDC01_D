@@ -30,12 +30,14 @@ typedef struct
     uint8_t  board_switch;
     uint8_t  board_temp;
     uint8_t  inksac_switch;
-    uint8_t  cir_switch;
+    uint8_t  cir_level;
     uint8_t  cir_start_time;
     uint8_t  cir_stop_time;
-    uint8_t  stir_switch;
+    uint8_t  cir_switch;
+    uint8_t  stir_level;
     uint8_t  stir_start_time;
     uint8_t  stir_stop_time;
+    uint8_t  stir_switch;
     uint8_t  ink_out_time;
 
     uint8_t  ink7_dis;

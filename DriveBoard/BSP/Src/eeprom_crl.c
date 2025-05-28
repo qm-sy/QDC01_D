@@ -25,13 +25,15 @@ void eeprom_statu_judge( void )
         qdc_info.board_temp      = 60;
         qdc_info.inksac_switch   = 1;
 
-        qdc_info.cir_switch      = 1;
+        qdc_info.cir_level      = 1;
         qdc_info.cir_start_time  = 10;
         qdc_info.cir_stop_time   = 20;
+        qdc_info.cir_switch      = 1;
 
-        qdc_info.stir_switch     = 2;
+        qdc_info.stir_level     = 2;
         qdc_info.stir_start_time = 15;
         qdc_info.stir_stop_time  = 25;
+        qdc_info.stir_switch     = 1;
 
         qdc_info.ink_out_time    = 50;
 
@@ -61,13 +63,15 @@ void eeprom_data_record( void )
     ISP_Write(BOARD_ADDR2,qdc_info.board_temp);
     ISP_Write(INKSAC_ADDR,qdc_info.inksac_switch);
 
-    ISP_Write(CIR_ADDR1,qdc_info.cir_switch);
+    ISP_Write(CIR_ADDR1,qdc_info.cir_level);
     ISP_Write(CIR_ADDR2,qdc_info.cir_start_time);
     ISP_Write(CIR_ADDR3,qdc_info.cir_stop_time);
+    ISP_Write(CIR_ADDR4,qdc_info.cir_switch);
 
-    ISP_Write(STIR_ADDR1,qdc_info.stir_switch);
+    ISP_Write(STIR_ADDR1,qdc_info.stir_level);
     ISP_Write(STIR_ADDR2,qdc_info.stir_start_time);
     ISP_Write(STIR_ADDR3,qdc_info.stir_stop_time);
+    ISP_Write(STIR_ADDR4,qdc_info.stir_switch);
     
     ISP_Write(INK_OUT_ADDR,qdc_info.ink_out_time);
 
@@ -101,14 +105,16 @@ void eeprom_data_init( void )
 
     qdc_info.inksac_switch = ISP_Read(INKSAC_ADDR);
 
-    qdc_info.cir_switch = ISP_Read(CIR_ADDR1);
+    qdc_info.cir_level = ISP_Read(CIR_ADDR1);
     qdc_info.cir_start_time = ISP_Read(CIR_ADDR2);
     qdc_info.cir_stop_time = ISP_Read(CIR_ADDR3);
+    qdc_info.cir_switch = ISP_Read(CIR_ADDR4);
 
-    qdc_info.stir_switch = ISP_Read(STIR_ADDR1);
+    qdc_info.stir_level = ISP_Read(STIR_ADDR1);
     qdc_info.stir_start_time = ISP_Read(STIR_ADDR2);
     qdc_info.stir_stop_time = ISP_Read(STIR_ADDR3);
-
+    qdc_info.stir_switch = ISP_Read(STIR_ADDR4);
+    
     qdc_info.ink_out_time = ISP_Read(INK_OUT_ADDR);
 
     qdc_info.ink7_dis = ISP_Read(INK_DIS);
